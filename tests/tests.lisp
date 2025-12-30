@@ -10,21 +10,23 @@
                      (results-status status)))
                  '(algebra))))
 
+(declaim (inline transpose))
 (defun transpose (m)
   (let ((res (make-array (reverse (array-dimensions m))
-                         :element-type 'single-float)))
+                         :element-type (array-element-type m))))
     (loop for i below (array-dimension m 0) do
       (loop for j below (array-dimension m 1) do
         (setf (aref res j i) (aref m i j))))
     res))
 
-(defun random-matrix (m n)
+(declaim (inline random-matrix))
+(defun random-matrix (m n type)
   (make-array (list m n)
-              :element-type 'single-float
+              :element-type type
               :initial-contents
               (loop repeat m collect
                     (loop repeat n collect
-                          (random 1.0)))))
+                          (random (coerce 1 type))))))
 
 (in-suite algebra)
 
@@ -39,17 +41,23 @@
                     (* (aref a i k) (aref b k j))))))
     result))
 
-(test multiplication
-  (loop repeat 100
-        for n = (+ (random 100) 20)
-        for m = (+ (random 100) 20)
-        for k = (+ (random 100) 20)
-        for a  = (random-matrix n k)
-        for at = (random-matrix k n)
-        for b  = (random-matrix k m)
-        for bt = (random-matrix m k) do
-          (is-true (array-approx-p (matrix-mul a b) (em:mult a b)))
-          (is-true (array-approx-p (matrix-mul (transpose at) b) (em:mult at b :ta t)))
-          (is-true (array-approx-p (matrix-mul a (transpose bt)) (em:mult a bt :tb t)))
-          (is-true (array-approx-p (matrix-mul (transpose at) (transpose bt))
-                                   (em:mult at bt :ta t :tb t)))))
+(macrolet ((def-multiplication-test (type)
+             (let ((name (intern (format nil "MULTIPLICATION/~a" type))))
+               `(test ,name
+                  (loop repeat 100
+                        for n = (+ (random 100) 20)
+                        for m = (+ (random 100) 20)
+                        for k = (+ (random 100) 20)
+                        for a  = (random-matrix n k ',type)
+                        for at = (random-matrix k n ',type)
+                        for b  = (random-matrix k m ',type)
+                        for bt = (random-matrix m k ',type) do
+                          (is-true (array-approx-p (matrix-mul a b) (em:mult a b)))
+                          (is-true (array-approx-p (matrix-mul (transpose at) b)
+                                                   (em:mult at b :ta t)))
+                          (is-true (array-approx-p (matrix-mul a (transpose bt))
+                                                   (em:mult a bt :tb t)))
+                          (is-true (array-approx-p (matrix-mul (transpose at) (transpose bt))
+                                   (em:mult at bt :ta t :tb t))))))))
+  (def-multiplication-test single-float)
+  (def-multiplication-test double-float))
