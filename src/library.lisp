@@ -18,3 +18,7 @@
    bindings
    :initial-value `(progn ,@body)
    :from-end t))
+
+;; Utility function to tell OpenMP not to use all available CPU resources
+(cffi:defcfun ("omp_set_num_threads" set-num-threads) :void
+  (num-threads :int))

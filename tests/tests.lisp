@@ -3,6 +3,7 @@
 (def-suite algebra :description "Algebraic operations")
 
 (defun run-tests ()
+  (em:set-num-threads 4)
   (every #'identity
          (mapcar (lambda (suite)
                    (let ((status (run suite)))
