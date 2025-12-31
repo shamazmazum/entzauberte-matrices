@@ -33,6 +33,19 @@
                                (random (coerce 1 (second type))))
                               (random (coerce 1 type)))))))
 
+(declaim (inline random-vector))
+(defun random-vector (n type)
+  (make-array n
+              :element-type type
+              :initial-contents
+              (loop repeat n
+                    collect
+                    (if (listp type)
+                        (complex
+                         (random (coerce 1 (second type)))
+                         (random (coerce 1 (second type))))
+                        (random (coerce 1 type))))))
+
 (in-suite algebra)
 
 (defun matrix-mul (a b)
@@ -44,6 +57,15 @@
         (setf (aref result i j)
               (loop for k below (array-dimension a 1) sum
                     (* (aref a i k) (aref b k j))))))
+    result))
+
+(defun add (a b)
+  (assert (equalp (array-dimensions a) (array-dimensions b)))
+  (let ((result (make-array (array-dimensions a))))
+    (loop for i below (array-total-size a) do
+          (setf (row-major-aref result i)
+                (+ (row-major-aref a i)
+                   (row-major-aref b i))))
     result))
 
 (macrolet ((def-multiplication-test (type)
@@ -71,3 +93,18 @@
   (def-multiplication-test double-float)
   (def-multiplication-test (complex single-float))
   (def-multiplication-test (complex double-float)))
+
+(test add-matrices
+  (loop repeat 100
+        for n = (+ (random 100) 20)
+        for m = (+ (random 100) 20)
+        for m1 = (random-matrix m n 'single-float)
+        for m2 = (random-matrix m n 'single-float) do
+          (is-true (array-approx-p (add m1 m2) (em:add m1 m2)))))
+
+(test add-vectors
+  (loop repeat 100
+        for n = (+ (random 100) 20)
+        for v1 = (random-vector n 'single-float)
+        for v2 = (random-vector n 'single-float) do
+          (is-true (array-approx-p (add v1 v2) (em:add v1 v2)))))

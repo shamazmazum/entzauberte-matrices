@@ -22,3 +22,6 @@
 ;; Utility function to tell OpenMP not to use all available CPU resources
 (cffi:defcfun ("omp_set_num_threads" set-num-threads) :void
   (num-threads :int))
+
+;; Useful type
+(deftype mat-or-vec (type) `(or (simple-array ,type 2) (simple-array ,type 1)))

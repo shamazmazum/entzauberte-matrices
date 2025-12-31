@@ -7,6 +7,7 @@
     :pathname "src"
     :components ((:file "package")
                  (:file "library")
+                 (:file "lisp-only")
                  (:file "mult"))
     :depends-on (:serapeum :cffi)
     :in-order-to ((test-op (load-op "entzauberte-matrices/tests")))

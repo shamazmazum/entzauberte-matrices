@@ -1,3 +1,4 @@
 (defpackage entzauberte-matrices
   (:use #:cl #:cffi)
-  (:export #:mult #:set-num-threads))
+  (:export #:mult #:add
+           #:set-num-threads))
