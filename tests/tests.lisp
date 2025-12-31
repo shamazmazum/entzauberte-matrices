@@ -26,7 +26,11 @@
               :initial-contents
               (loop repeat m collect
                     (loop repeat n collect
-                          (random (coerce 1 type))))))
+                          (if (listp type)
+                              (complex
+                               (random (coerce 1 (second type)))
+                               (random (coerce 1 (second type))))
+                              (random (coerce 1 type)))))))
 
 (in-suite algebra)
 
@@ -42,7 +46,10 @@
     result))
 
 (macrolet ((def-multiplication-test (type)
-             (let ((name (intern (format nil "MULTIPLICATION/~a" type))))
+             (let ((name (intern
+                          (if (listp type)
+                              (format nil "MULTIPLICATION/COMPLEX-~a" (second type))
+                              (format nil "MULTIPLICATION/~a" type)))))
                `(test ,name
                   (loop repeat 100
                         for n = (+ (random 100) 20)
@@ -60,4 +67,6 @@
                           (is-true (array-approx-p (matrix-mul (transpose at) (transpose bt))
                                    (em:mult at bt :ta t :tb t))))))))
   (def-multiplication-test single-float)
-  (def-multiplication-test double-float))
+  (def-multiplication-test double-float)
+  (def-multiplication-test (complex single-float))
+  (def-multiplication-test (complex double-float)))
