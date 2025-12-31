@@ -37,3 +37,19 @@
                 (+ (* c1 (row-major-aref m1 i))
                    (* c2 (row-major-aref m2 i))))))
       result)))
+
+;; This is really trivial
+(serapeum:-> scale ((mat-or-vec *) number)
+             (values (mat-or-vec *) &optional))
+(declaim (inline scale))
+(defun scale (v s)
+  (unless (typep s (array-element-type v))
+    (error "The matrix and the scalar are of incompatible types."))
+  (let ((result (make-array (array-dimensions v)
+                            :element-type (array-element-type v))))
+    (locally
+        (declare (optimize (sb-c:insert-array-bounds-checks 0)))
+      (loop for i below (array-total-size v) do
+        (setf (row-major-aref result i)
+              (* s (row-major-aref v i)))))
+    result))

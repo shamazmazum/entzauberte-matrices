@@ -68,6 +68,13 @@
                    (row-major-aref b i))))
     result))
 
+(defun scale (v s)
+  (let ((result (make-array (array-dimensions v))))
+    (loop for i below (array-total-size v) do
+      (setf (row-major-aref result i)
+            (* (row-major-aref v i) s)))
+    result))
+
 (macrolet ((def-multiplication-test (type)
              (let ((name (intern
                           (if (listp type)
@@ -108,3 +115,18 @@
         for v1 = (random-vector n 'single-float)
         for v2 = (random-vector n 'single-float) do
           (is-true (array-approx-p (add v1 v2) (em:add v1 v2)))))
+
+(test scale-matrix
+  (loop repeat 100
+        for n = (+ (random 100) 20)
+        for m = (+ (random 100) 20)
+        for mat = (random-matrix m n 'single-float)
+        for s = (random 1.0) do
+          (is-true (array-approx-p (scale mat s) (em:scale mat s)))))
+
+(test scale-vector
+  (loop repeat 100
+        for n = (+ (random 100) 20)
+        for v = (random-vector n 'single-float)
+        for s = (random 1.0) do
+          (is-true (array-approx-p (scale v s) (em:scale v s)))))
