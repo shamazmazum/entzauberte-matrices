@@ -35,7 +35,8 @@
   (def-det det-cs-unsafe (complex single-float))
   (def-det det-cd-unsafe (complex double-float)))
 
-
+(serapeum:-> det ((mat *))
+             (values number &optional))
 (declaim (inline det))
 (defun det (m)
   (unless (= (array-dimension m 0)

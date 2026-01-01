@@ -2,5 +2,5 @@
   (:use #:cl #:cffi)
   (:export #:lapack-error
            #:mult #:add #:scale
-           #:det #:inversions
+           #:det #:inversions #:invert
            #:set-num-threads))

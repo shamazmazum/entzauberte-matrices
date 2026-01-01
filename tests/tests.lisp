@@ -2,6 +2,7 @@
 
 (def-suite algebra :description "Algebraic operations")
 (def-suite det     :description "Determinant")
+(def-suite inv     :description "Inversion")
 
 (defun run-tests ()
   (em:set-num-threads 4)
@@ -164,7 +165,7 @@
                `(test ,name
                   (loop repeat 400
                         for n = (+ (random 6) 2)
-                        for a  = (random-matrix n n ',type) do
+                        for a = (random-matrix n n ',type) do
                           (is (approxp (det a) (em:det a)
                                        :rtol
                                        (/ (coerce 100
@@ -175,3 +176,31 @@
   (def-det-test double-float)
   (def-det-test (complex single-float))
   (def-det-test (complex double-float)))
+
+(in-suite inv)
+
+(declaim (inline make-identity))
+(defun make-identity (n type)
+  (let ((id (make-array (list n n)
+                        :element-type type
+                        :initial-element (coerce 0 type))))
+    (loop for i below n do
+      (setf (aref id i i) (coerce 1 type)))
+    id))
+
+(macrolet ((def-inv-test (type)
+             (let ((name (intern
+                          (if (listp type)
+                              (format nil "INV/COMPLEX-~a" (second type))
+                              (format nil "INV/~a" type)))))
+               `(test ,name
+                  (loop repeat 400
+                        for n   = (+ (random 6) 2)
+                        for a   = (random-matrix n n ',type)
+                        for inv = (em:invert a)
+                        for id  = (em:mult a inv) do
+                          (is-true (array-approx-p id (make-identity n ',type))))))))
+  (def-inv-test single-float)
+  (def-inv-test double-float)
+  (def-inv-test (complex single-float))
+  (def-inv-test (complex double-float)))

@@ -23,14 +23,15 @@
 (cffi:defcfun ("omp_set_num_threads" set-num-threads) :void
   (num-threads :int))
 
-;; Useful type
-(deftype mat-or-vec (type) `(or (simple-array ,type 2) (simple-array ,type 1)))
+;; Useful types
+(deftype mat (type) `(simple-array ,type 2))
+(deftype vec (type) `(simple-array ,type 1))
+(deftype mat-or-vec (type) `(or (mat ,type) (vec ,type)))
 
 ;; And another useful function
-(declaim (inline copy-for-ffi))
-(defun copy-for-ffi (a)
-  "Make a copy of an array + fast transposition"
-  (let ((result (make-array (reverse (array-dimensions a))
+(declaim (inline copy-array))
+(defun copy-array (a)
+  (let ((result (make-array (array-dimensions a)
                             :element-type (array-element-type a))))
     (replace (sb-ext:array-storage-vector result)
              (sb-ext:array-storage-vector a))

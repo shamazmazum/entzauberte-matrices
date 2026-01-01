@@ -83,6 +83,8 @@
   (define-lisp-mult mult-cs-unsafe %cgemm (complex single-float) :float)
   (define-lisp-mult mult-cd-unsafe %zgemm (complex double-float) :double))
 
+(serapeum:-> mult ((mat *) (mat *) &key (:ta boolean) (:tb boolean) (:scale number))
+             (values (mat *) &optional))
 (declaim (inline mult))
 (defun mult (a b &key ta tb scale)
   (unless (= (array-dimension a (if ta 0 1))

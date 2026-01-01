@@ -30,7 +30,7 @@
                          (n (array-dimension a 0)) ; Number of columns
                          (lda m)
                          (ipiv (make-array (min m n) :element-type '(unsigned-byte 32)))
-                         (acopy (copy-for-ffi a)))
+                         (acopy (copy-array a)))
                     (with-foreign-objects ((mptr    :int)
                                            (nptr    :int)
                                            (ldaptr  :int)
@@ -50,6 +50,8 @@
   (def-lisp-lu %lu-cs %cgetrf (complex single-float))
   (def-lisp-lu %lu-cd %zgetrf (complex double-float)))
 
+(serapeum:-> %lu ((mat *))
+             (values (mat *) (vec (unsigned-byte 32)) integer &optional))
 (declaim (inline %lu))
 (defun %lu (a)
   (cond
