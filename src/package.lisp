@@ -1,4 +1,6 @@
 (defpackage entzauberte-matrices
   (:use #:cl #:cffi)
-  (:export #:mult #:add #:scale
+  (:export #:lapack-error
+           #:mult #:add #:scale
+           #:det #:inversions
            #:set-num-threads))

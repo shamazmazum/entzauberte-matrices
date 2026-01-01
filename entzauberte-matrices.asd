@@ -8,7 +8,9 @@
     :components ((:file "package")
                  (:file "library")
                  (:file "lisp-only")
-                 (:file "mult"))
+                 (:file "mult")
+                 (:file "lu")
+                 (:file "det"))
     :depends-on (:serapeum :cffi)
     :in-order-to ((test-op (load-op "entzauberte-matrices/tests")))
     :perform (test-op (op system)
@@ -22,4 +24,7 @@
     :pathname "tests"
     :components ((:file "package")
                  (:file "tests" :depends-on ("package")))
-    :depends-on (:entzauberte-matrices :fiveam :approx))
+    :depends-on (:entzauberte-matrices
+                 :alexandria
+                 :fiveam
+                 :approx))

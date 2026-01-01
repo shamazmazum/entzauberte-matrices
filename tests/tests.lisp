@@ -1,6 +1,7 @@
 (in-package :entzauberte-matrices/tests)
 
 (def-suite algebra :description "Algebraic operations")
+(def-suite det     :description "Determinant")
 
 (defun run-tests ()
   (em:set-num-threads 4)
@@ -9,7 +10,7 @@
                    (let ((status (run suite)))
                      (explain! status)
                      (results-status status)))
-                 '(algebra))))
+                 '(algebra det))))
 
 (declaim (inline transpose))
 (defun transpose (m)
@@ -130,3 +131,47 @@
         for v = (random-vector n 'single-float)
         for s = (random 1.0) do
           (is-true (array-approx-p (scale v s) (em:scale v s)))))
+
+(in-suite det)
+
+(defun permutations (n)
+  (let (perm)
+    (alexandria:map-permutations
+     (lambda (p) (push p perm))
+     (loop for i below n collect i))
+    perm))
+
+(defun det (m)
+  (assert (= (array-dimension m 0)
+             (array-dimension m 1)))
+  (let ((length (array-dimension m 0)))
+    (loop for %perm in (permutations length)
+          for perm = (make-array length
+                                :element-type '(unsigned-byte 32)
+                                :initial-contents %perm)
+          sum
+          (* (expt -1 (em:inversions perm))
+             (let ((d 1))
+               (loop for i below length do
+                 (setq d (* d (aref m i (aref perm i)))))
+               d)))))
+
+(macrolet ((def-det-test (type)
+             (let ((name (intern
+                          (if (listp type)
+                              (format nil "DET/COMPLEX-~a" (second type))
+                              (format nil "DET/~a" type)))))
+               `(test ,name
+                  (loop repeat 400
+                        for n = (+ (random 6) 2)
+                        for a  = (random-matrix n n ',type) do
+                          (is (approxp (det a) (em:det a)
+                                       :rtol
+                                       (/ (coerce 100
+                                                  ',(if (listp type)
+                                                        (second type)
+                                                        type))))))))))
+  (def-det-test single-float)
+  (def-det-test double-float)
+  (def-det-test (complex single-float))
+  (def-det-test (complex double-float)))

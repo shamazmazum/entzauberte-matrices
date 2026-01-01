@@ -13,7 +13,7 @@
    (lambda (binding acc)
      (destructuring-bind (ptr array)
          binding
-       `(with-pointer-to-vector-data (,ptr ,array)
+       `(with-pointer-to-vector-data (,ptr (sb-ext:array-storage-vector ,array))
           ,acc)))
    bindings
    :initial-value `(progn ,@body)
@@ -25,3 +25,38 @@
 
 ;; Useful type
 (deftype mat-or-vec (type) `(or (simple-array ,type 2) (simple-array ,type 1)))
+
+;; And another useful function
+(declaim (inline copy-for-ffi))
+(defun copy-for-ffi (a)
+  "Make a copy of an array + fast transposition"
+  (let ((result (make-array (reverse (array-dimensions a))
+                            :element-type (array-element-type a))))
+    (replace (sb-ext:array-storage-vector result)
+             (sb-ext:array-storage-vector a))
+    result))
+
+;; Transform LAPACK "pivot" indices to "normal" permutation matrix indices.
+(serapeum:-> fix-pivot ((simple-array (unsigned-byte 32) (*)))
+             (values (simple-array (unsigned-byte 32) (*)) &optional))
+(defun fix-pivot (indices)
+  (declare (optimize (speed 3)))
+  (let* ((length (length indices))
+         (new-indices (make-array length :element-type '(unsigned-byte 32))))
+    (loop for i below length do
+      (setf (aref new-indices i) i))
+    (loop for i below length
+          ;; Fortran starts indexing from 1
+          for idx = (1- (aref indices i))
+          when (/= idx i) do
+            (rotatef (aref new-indices i)
+                     (aref new-indices idx)))
+    new-indices))
+
+(define-condition lapack-error (error)
+  ((message :type    string
+            :initarg :message
+            :reader  error-message))
+  (:report
+   (lambda (c s)
+     (format s "LAPACK error: ~a" (error-message c)))))
