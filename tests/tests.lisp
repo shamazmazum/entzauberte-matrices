@@ -3,6 +3,7 @@
 (def-suite algebra :description "Algebraic operations")
 (def-suite det     :description "Determinant")
 (def-suite inv     :description "Inversion")
+(def-suite eig     :description "Eigenvalue decomposition")
 
 (defun run-tests ()
   (em:set-num-threads 4)
@@ -11,7 +12,7 @@
                    (let ((status (run suite)))
                      (explain! status)
                      (results-status status)))
-                 '(algebra det))))
+                 '(algebra det inv eig))))
 
 (declaim (inline transpose))
 (defun transpose (m)
@@ -34,6 +35,22 @@
                                (random (coerce 1 (second type)))
                                (random (coerce 1 (second type))))
                               (random (coerce 1 type)))))))
+
+(declaim (inline random-self-adjoint))
+(defun random-self-adjoint (n type)
+  (let ((result (make-array (list n n)
+                            :element-type type)))
+    (loop for i below n do
+      (loop for j from i below n do
+        (if (<= i j)
+            (let ((v (if (listp type)
+                         (complex
+                          (random (coerce 1 (second type)))
+                          (random (coerce 1 (second type))))
+                         (random (coerce 1 type)))))
+              (setf (aref result i j) v
+                    (aref result j i) (conjugate v))))))
+    result))
 
 (declaim (inline random-vector))
 (defun random-vector (n type)
@@ -204,3 +221,32 @@
   (def-inv-test double-float)
   (def-inv-test (complex single-float))
   (def-inv-test (complex double-float)))
+
+(in-suite eig)
+
+(defun multiply-eig (%t Λ)
+  (let ((result (make-array (array-dimensions %t)
+                            :element-type (array-element-type %t))))
+    (loop for i below (array-dimension result 0) do
+      (loop for j below (array-dimension result 1) do
+        (setf (aref result i j)
+              (* (aref %t i j)
+                 (aref Λ i)))))
+    result))
+
+(macrolet ((def-eig-test (type)
+             (let ((name (intern
+                          (if (listp type)
+                              (format nil "EIG-SYM/COMPLEX-~a" (second type))
+                              (format nil "EIG-SYM/~a" type)))))
+               `(test ,name
+                  (loop repeat 400
+                        for n   = (+ (random 6) 2)
+                        for a   = (random-self-adjoint n ',type) do
+                          (multiple-value-bind (Λ %t)
+                              (em:eig-self-adjoint a :upper)
+                            (is-true (array-approx-p
+                                      (em:mult %t a)
+                                      (multiply-eig %t Λ)))))))))
+  (def-eig-test single-float)
+  (def-eig-test double-float))

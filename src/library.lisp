@@ -55,9 +55,16 @@
     new-indices))
 
 (define-condition lapack-error (error)
-  ((message :type    string
-            :initarg :message
-            :reader  error-message))
+  ((message :type     string
+            :initarg  :message
+            :reader   error-message)
+   (info    :type     (or integer null)
+            :initform nil
+            :initarg  :info
+            :reader   error-info))
   (:report
    (lambda (c s)
-     (format s "LAPACK error: ~a" (error-message c)))))
+     (format s "LAPACK error: ~a " (error-message c))
+     (let ((info (error-info c)))
+       (when info
+         (format s "INFO: ~d" info))))))
