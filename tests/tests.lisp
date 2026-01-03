@@ -46,7 +46,9 @@
             (let ((v (if (listp type)
                          (complex
                           (random (coerce 1 (second type)))
-                          (random (coerce 1 (second type))))
+                          (if (= i j)
+                              (coerce 0 (second type))
+                              (random (coerce 1 (second type)))))
                          (random (coerce 1 type)))))
               (setf (aref result i j) v
                     (aref result j i) (conjugate v))))))
@@ -252,4 +254,6 @@
                             (multiple-value-call #'check
                               (em:eig-self-adjoint a :lower))))))))
   (def-eig-test single-float)
-  (def-eig-test double-float))
+  (def-eig-test double-float)
+  (def-eig-test (complex single-float))
+  (def-eig-test (complex double-float)))

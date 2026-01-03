@@ -37,6 +37,14 @@
              (sb-ext:array-storage-vector a))
     result))
 
+;; And another one
+(declaim (inline map-array))
+(defun map-array (f a)
+  (let ((result (make-array (array-dimensions a)
+                            :element-type (array-element-type a))))
+    (map-into (sb-ext:array-storage-vector result) f (sb-ext:array-storage-vector a))
+    result))
+
 ;; Transform LAPACK "pivot" indices to "normal" permutation matrix indices.
 (serapeum:-> fix-pivot ((simple-array (unsigned-byte 32) (*)))
              (values (simple-array (unsigned-byte 32) (*)) &optional))
