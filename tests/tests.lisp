@@ -243,10 +243,13 @@
                   (loop repeat 400
                         for n   = (+ (random 6) 2)
                         for a   = (random-self-adjoint n ',type) do
-                          (multiple-value-bind (Λ %t)
-                              (em:eig-self-adjoint a :upper)
-                            (is-true (array-approx-p
-                                      (em:mult %t a)
-                                      (multiply-eig %t Λ)))))))))
+                          (flet ((check (Λ %t)
+                                   (is-true (array-approx-p
+                                             (em:mult %t a)
+                                             (multiply-eig %t Λ)))))
+                            (multiple-value-call #'check
+                              (em:eig-self-adjoint a :upper))
+                            (multiple-value-call #'check
+                              (em:eig-self-adjoint a :lower))))))))
   (def-eig-test single-float)
   (def-eig-test double-float))
