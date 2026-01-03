@@ -12,7 +12,7 @@
                  (:file "lu")
                  (:file "det")
                  (:file "inv")
-                 (:file "eig"))
+                 (:file "eig-self-adjoint"))
     :depends-on (:serapeum :cffi)
     :in-order-to ((test-op (load-op "entzauberte-matrices/tests")))
     :perform (test-op (op system)
