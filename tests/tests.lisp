@@ -253,7 +253,7 @@
                               (format nil "EIG-SYM/~a" type)))))
                `(test ,name
                   (loop repeat 400
-                        for n   = (+ (random 6) 2)
+                        for n   = (+ (random 100) 2)
                         for a   = (random-self-adjoint n ',type) do
                           (flet ((check (Λ %t)
                                    (is-true (array-approx-p
@@ -275,7 +275,7 @@
                               (format nil "EIG/~a" type)))))
                `(test ,name
                   (loop repeat 400
-                        for n   = (+ (random 6) 2)
+                        for n   = (+ (random 100) 2)
                         for a   = (random-matrix n n ',type) do
                           (multiple-value-bind (Λ %T)
                               (em:eig a)
