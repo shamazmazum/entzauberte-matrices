@@ -236,10 +236,20 @@
                  (aref Λ i)))))
     result))
 
+(defun convert-to-complex (a)
+  (let ((type (array-element-type a)))
+    (if (listp type) a
+        (let ((result (make-array (array-dimensions a)
+                                  :element-type (list 'complex type))))
+          (map-into (sb-ext:array-storage-vector result)
+                    #'complex
+                    (sb-ext:array-storage-vector a))
+          result))))
+
 (macrolet ((def-eig-test (type)
              (let ((name (intern
                           (if (listp type)
-                              (format nil "EIG-SYM/COMPLEX-~a" (second type))
+                              (format nil "EIG-HERM/COMPLEX-~a" (second type))
                               (format nil "EIG-SYM/~a" type)))))
                `(test ,name
                   (loop repeat 400
@@ -257,3 +267,20 @@
   (def-eig-test double-float)
   (def-eig-test (complex single-float))
   (def-eig-test (complex double-float)))
+
+(macrolet ((def-eig-test (type)
+             (let ((name (intern
+                          (if (listp type)
+                              (format nil "EIG/COMPLEX-~a" (second type))
+                              (format nil "EIG/~a" type)))))
+               `(test ,name
+                  (loop repeat 400
+                        for n   = (+ (random 6) 2)
+                        for a   = (random-matrix n n ',type) do
+                          (multiple-value-bind (Λ %T)
+                              (em:eig a)
+                            (is-true (array-approx-p
+                                      (em:mult %T (convert-to-complex a))
+                                      (multiply-eig %T Λ)))))))))
+  (def-eig-test single-float)
+  (def-eig-test double-float))
