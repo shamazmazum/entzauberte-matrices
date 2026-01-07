@@ -283,4 +283,6 @@
                                       (em:mult %T (convert-to-complex a))
                                       (multiply-eig %T Λ)))))))))
   (def-eig-test single-float)
-  (def-eig-test double-float))
+  (def-eig-test double-float)
+  (def-eig-test (complex single-float))
+  (def-eig-test (complex double-float)))
