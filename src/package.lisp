@@ -3,5 +3,5 @@
   (:export #:lapack-error
            #:mult #:add #:scale
            #:det #:inversions #:invert
-           #:eig #:eig-self-adjoint
+           #:eig #:eig-self-adjoint #:svd
            #:set-num-threads))

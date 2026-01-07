@@ -4,6 +4,7 @@
 (def-suite det     :description "Determinant")
 (def-suite inv     :description "Inversion")
 (def-suite eig     :description "Eigenvalue decomposition")
+(def-suite svd     :description "SVD decomposition")
 
 (defun run-tests ()
   (em:set-num-threads 4)
@@ -255,8 +256,8 @@
                               (format nil "EIG-SYM/~a" type)))))
                `(test ,name
                   (loop repeat 400
-                        for n   = (+ (random 100) 2)
-                        for a   = (random-self-adjoint n ',type) do
+                        for n = (+ (random 100) 2)
+                        for a = (random-self-adjoint n ',type) do
                           (flet ((check (Λ %t)
                                    (is-true (array-approx-p
                                              (em:mult %t a)
@@ -277,8 +278,8 @@
                               (format nil "EIG/~a" type)))))
                `(test ,name
                   (loop repeat 400
-                        for n   = (+ (random 100) 2)
-                        for a   = (random-matrix n n ',type) do
+                        for n = (+ (random 100) 2)
+                        for a = (random-matrix n n ',type) do
                           (multiple-value-bind (Λ %T)
                               (em:eig a)
                             (is-true (array-approx-p
@@ -288,3 +289,41 @@
   (def-eig-test double-float)
   (def-eig-test (complex single-float))
   (def-eig-test (complex double-float)))
+
+(in-suite svd)
+
+(declaim (inline from-diag))
+(defun from-diag (d m n)
+  (assert (= (length d) (min m n)))
+  (let* ((length (length d))
+         (type (array-element-type d))
+         (result (make-array (list m n)
+                             :element-type type
+                             :initial-element (coerce 0 type))))
+    (loop for i below length do
+      (setf (aref result i i) (aref d i)))
+    result))
+
+(macrolet ((def-svd-test (type)
+             (let ((name (intern
+                          (if (listp type)
+                              (format nil "SVD/COMPLEX-~a" (second type))
+                              (format nil "SVD/~a" type)))))
+               `(test ,name
+                  (loop repeat 400
+                        for m = (+ (random 100) 2)
+                        for n = (+ (random 100) 2)
+                        for a = (random-matrix m n ',type) do
+                          (multiple-value-bind (u s vt)
+                              (em:svd a)
+                            (is-true (array-approx-p
+                                      (em:mult u (transpose u))
+                                      (make-identity m ',type)))
+                            (is-true (array-approx-p
+                                      (em:mult vt (transpose vt))
+                                      (make-identity n ',type)))
+                            (is-true (array-approx-p
+                                      (em:mult (em:mult u (from-diag s m n)) vt)
+                                      a))))))))
+  (def-svd-test single-float)
+  (def-svd-test double-float))
