@@ -5,6 +5,7 @@
 (def-suite inv     :description "Inversion")
 (def-suite eig     :description "Eigenvalue decomposition")
 (def-suite svd     :description "SVD decomposition")
+(def-suite solver  :description "Solver")
 
 (defun run-tests ()
   (em:set-num-threads 4)
@@ -13,16 +14,7 @@
                    (let ((status (run suite)))
                      (explain! status)
                      (results-status status)))
-                 '(algebra det inv eig svd))))
-
-(declaim (inline transpose))
-(defun transpose (m)
-  (let ((res (make-array (reverse (array-dimensions m))
-                         :element-type (array-element-type m))))
-    (loop for i below (array-dimension m 0) do
-      (loop for j below (array-dimension m 1) do
-        (setf (aref res j i) (aref m i j))))
-    res))
+                 '(algebra det inv eig svd solver))))
 
 (declaim (inline conjugate-transpose))
 (defun conjugate-transpose (m)
@@ -121,11 +113,12 @@
                         for b  = (random-matrix k m ',type)
                         for bt = (random-matrix m k ',type) do
                           (is-true (array-approx-p (matrix-mul a b) (em:mult a b)))
-                          (is-true (array-approx-p (matrix-mul (transpose at) b)
+                          (is-true (array-approx-p (matrix-mul (em:transpose at) b)
                                                    (em:mult at b :ta t)))
-                          (is-true (array-approx-p (matrix-mul a (transpose bt))
+                          (is-true (array-approx-p (matrix-mul a (em:transpose bt))
                                                    (em:mult a bt :tb t)))
-                          (is-true (array-approx-p (matrix-mul (transpose at) (transpose bt))
+                          (is-true (array-approx-p (matrix-mul (em:transpose at)
+                                                               (em:transpose bt))
                                    (em:mult at bt :ta t :tb t))))))))
   (def-multiplication-test single-float)
   (def-multiplication-test double-float)
@@ -345,3 +338,26 @@
   (def-svd-test double-float)
   (def-svd-test (complex single-float))
   (def-svd-test (complex double-float)))
+
+(in-suite solver)
+
+(macrolet ((def-solver-test (type)
+             (let ((name (intern
+                          (if (listp type)
+                              (format nil "SOLVER/COMPLEX-~a" (second type))
+                              (format nil "SOLVER/~a" type)))))
+               `(test ,name
+                  (loop repeat 2000
+                        for n    = (+ (random 30) 2)
+                        for cols = (+ (random 30) 2)
+                        for a    = (random-matrix n n ',type)
+                        for det  = (em:det a)
+                        when (> (abs det) 1f-1) do
+                          (let* ((b  (random-matrix n cols ',type))
+                                 (x  (em:solve a b))
+                                 (%b (em:mult a x)))
+                            (is-true (array-approx-p b %b))))))))
+  (def-solver-test single-float)
+  (def-solver-test double-float)
+  (def-solver-test (complex single-float))
+  (def-solver-test (complex double-float)))
