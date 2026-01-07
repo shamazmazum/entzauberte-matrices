@@ -13,7 +13,7 @@
                    (let ((status (run suite)))
                      (explain! status)
                      (results-status status)))
-                 '(algebra det inv eig))))
+                 '(algebra det inv eig svd))))
 
 (declaim (inline transpose))
 (defun transpose (m)
@@ -22,6 +22,15 @@
     (loop for i below (array-dimension m 0) do
       (loop for j below (array-dimension m 1) do
         (setf (aref res j i) (aref m i j))))
+    res))
+
+(declaim (inline conjugate-transpose))
+(defun conjugate-transpose (m)
+  (let ((res (make-array (reverse (array-dimensions m))
+                         :element-type (array-element-type m))))
+    (loop for i below (array-dimension m 0) do
+      (loop for j below (array-dimension m 1) do
+        (setf (aref res j i) (conjugate (aref m i j)))))
     res))
 
 (declaim (inline random-matrix))
@@ -308,7 +317,8 @@
              (let ((name (intern
                           (if (listp type)
                               (format nil "SVD/COMPLEX-~a" (second type))
-                              (format nil "SVD/~a" type)))))
+                              (format nil "SVD/~a" type))))
+                   (complexp (listp type)))
                `(test ,name
                   (loop repeat 400
                         for m = (+ (random 100) 2)
@@ -316,14 +326,19 @@
                         for a = (random-matrix m n ',type) do
                           (multiple-value-bind (u s vt)
                               (em:svd a)
-                            (is-true (array-approx-p
-                                      (em:mult u (transpose u))
-                                      (make-identity m ',type)))
-                            (is-true (array-approx-p
-                                      (em:mult vt (transpose vt))
-                                      (make-identity n ',type)))
-                            (is-true (array-approx-p
-                                      (em:mult (em:mult u (from-diag s m n)) vt)
-                                      a))))))))
+                            (let ((s (from-diag s m n)))
+                              (is-true (array-approx-p
+                                        (em:mult u (conjugate-transpose u))
+                                        (make-identity m ',type)))
+                              (is-true (array-approx-p
+                                        (em:mult vt (conjugate-transpose vt))
+                                        (make-identity n ',type)))
+                              (is-true (array-approx-p
+                                        (em:mult
+                                         (em:mult u ,(if complexp '(convert-to-complex s) 's))
+                                         vt)
+                                        a)))))))))
   (def-svd-test single-float)
-  (def-svd-test double-float))
+  (def-svd-test double-float)
+  (def-svd-test (complex single-float))
+  (def-svd-test (complex double-float)))
