@@ -180,11 +180,11 @@
   (cond
     ((eq (array-element-type m) 'single-float)
      (eig-rs-unsafe m))
-     ((eq (array-element-type m) 'double-float)
-      (eig-rd-unsafe m))
-     ((equalp (array-element-type m) '(complex single-float))
-      (eig-cs-unsafe m))
-     ((equalp (array-element-type m) '(complex double-float))
-      (eig-cd-unsafe m))
-     (t
-      (error "Cannot compute eigenvalues: unknown array element type"))))
+    ((eq (array-element-type m) 'double-float)
+     (eig-rd-unsafe m))
+    ((equalp (array-element-type m) '(complex single-float))
+     (eig-cs-unsafe m))
+    ((equalp (array-element-type m) '(complex double-float))
+     (eig-cd-unsafe m))
+    (t
+     (error "Cannot compute eigenvalues: unknown array element type"))))
