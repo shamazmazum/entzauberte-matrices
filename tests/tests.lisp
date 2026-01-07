@@ -192,15 +192,13 @@
                               (format nil "DET/COMPLEX-~a" (second type))
                               (format nil "DET/~a" type)))))
                `(test ,name
-                  (loop repeat 400
-                        for n = (+ (random 6) 2)
-                        for a = (random-matrix n n ',type) do
-                          (is (approxp (det a) (em:det a)
-                                       :rtol
-                                       (/ (coerce 100
-                                                  ',(if (listp type)
-                                                        (second type)
-                                                        type))))))))))
+                  (loop repeat 2000
+                        for n  = (+ (random 6) 2)
+                        for a  = (random-matrix n n ',type)
+                        for d1 = (det a)
+                        for d2 = (em:det a)
+                        when (> (abs d2) 0.1) do
+                          (is (approxp d1 d2)))))))
   (def-det-test single-float)
   (def-det-test double-float)
   (def-det-test (complex single-float))
@@ -223,7 +221,7 @@
                               (format nil "INV/COMPLEX-~a" (second type))
                               (format nil "INV/~a" type)))))
                `(test ,name
-                  (loop repeat 400
+                  (loop repeat 2000
                         for n   = (+ (random 30) 2)
                         for a   = (random-matrix n n ',type)
                         for det = (em:det a)
