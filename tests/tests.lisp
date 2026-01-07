@@ -214,11 +214,13 @@
                               (format nil "INV/~a" type)))))
                `(test ,name
                   (loop repeat 400
-                        for n   = (+ (random 6) 2)
+                        for n   = (+ (random 30) 2)
                         for a   = (random-matrix n n ',type)
-                        for inv = (em:invert a)
-                        for id  = (em:mult a inv) do
-                          (is-true (array-approx-p id (make-identity n ',type))))))))
+                        for det = (em:det a)
+                        when (> (abs det) 0.1) do
+                        (let* ((inv (em:invert a))
+                               (id  (em:mult a inv)))
+                          (is-true (array-approx-p id (make-identity n ',type)))))))))
   (def-inv-test single-float)
   (def-inv-test double-float)
   (def-inv-test (complex single-float))
