@@ -29,18 +29,21 @@
              (let* ((complexp (listp lisp-type))
                     (real-type (if complexp (second lisp-type) lisp-type)))
                `(progn
-                  (serapeum:-> ,name ((mat ,lisp-type))
+                  (serapeum:-> ,name ((mat ,lisp-type) boolean)
                                (values (mat ,lisp-type)
                                        (vec ,real-type)
                                        (mat ,lisp-type)
                                        &optional))
-                  (defun ,name (a)
+                  (defun ,name (a compact)
                     (let* ((m (array-dimension a 1)) ; Number of rows in A^T
                            (n (array-dimension a 0)) ; Number of columns in A^T
+                           (min (min n m))
                            (acopy (copy-array a))
-                           (s  (make-array (min n m)  :element-type ',real-type))
-                           (u  (make-array (list m m) :element-type ',lisp-type))
-                           (vt (make-array (list n n) :element-type ',lisp-type)))
+                           (s  (make-array min  :element-type ',real-type))
+                           (u  (make-array (list (if compact min m) m)
+                                           :element-type ',lisp-type))
+                           (vt (make-array (list n (if compact min n))
+                                           :element-type ',lisp-type)))
                       (with-foreign-objects ((jobuptr  :char)
                                              (jobvtptr :char)
                                              (mptr     :int)
@@ -50,7 +53,7 @@
                                              (ldvtptr  :int)
                                              ,@(if complexp
                                                    `((rworkptr ,foreign-type
-                                                               (* (min m n) 5))))
+                                                               (* min 5))))
                                              (infoptr  :int))
                         (flet ((check-info ()
                                  (unless (zerop (mem-ref infoptr :int))
@@ -61,14 +64,14 @@
                                                 (uptr  u)
                                                 (vtptr vt))
                             (setf (mem-ref jobuptr :char)
-                                  (char-code #\A)
+                                  (char-code (if compact #\S #\A))
                                   (mem-ref jobvtptr :char)
-                                  (char-code #\A)
+                                  (char-code (if compact #\S #\A))
                                   (mem-ref mptr :int) m
                                   (mem-ref nptr :int) n
                                   (mem-ref ldaptr :int) m
                                   (mem-ref lduptr :int) m
-                                  (mem-ref ldvtptr :int) n)
+                                  (mem-ref ldvtptr :int) (if compact min n))
                             (let ((work
                                     (with-foreign-objects ((workptr
                                                             ,foreign-type ,(if complexp 2 1))
@@ -96,18 +99,20 @@
   (def-svd svd-cs %cgesvd (complex single-float) :float)
   (def-svd svd-cd %zgesvd (complex double-float) :double))
 
-(serapeum:-> svd ((mat *))
+(serapeum:-> svd ((mat *) &key (:compact boolean))
              (values (mat *) (vec *) (mat *) &optional))
 (declaim (inline svd))
-(defun svd (m)
-  (cond
-    ((eq (array-element-type m) 'single-float)
-     (svd-rs m))
-    ((eq (array-element-type m) 'double-float)
-     (svd-rd m))
-    ((equalp (array-element-type m) '(complex single-float))
-     (svd-cs m))
-    ((equalp (array-element-type m) '(complex double-float))
-     (svd-cd m))
-    (t
-     (error "Cannot compute SVD decomposition: unknown array element type"))))
+(defun svd (m &key compact)
+  (funcall
+   (cond
+     ((eq (array-element-type m) 'single-float)
+      #'svd-rs)
+     ((eq (array-element-type m) 'double-float)
+      #'svd-rd)
+     ((equalp (array-element-type m) '(complex single-float))
+      #'svd-cs)
+     ((equalp (array-element-type m) '(complex double-float))
+      #'svd-cd)
+     (t
+      (error "Cannot compute SVD decomposition: unknown array element type")))
+   m compact))

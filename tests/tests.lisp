@@ -319,23 +319,28 @@
                    (complexp (listp type)))
                `(test ,name
                   (loop repeat 400
-                        for m = (+ (random 100) 2)
-                        for n = (+ (random 100) 2)
-                        for a = (random-matrix m n ',type) do
-                          (multiple-value-bind (u s vt)
-                              (em:svd a)
-                            (let ((s (from-diag s m n)))
-                              (is-true (array-approx-p
-                                        (em:mult u (conjugate-transpose u))
-                                        (make-identity m ',type)))
-                              (is-true (array-approx-p
-                                        (em:mult vt (conjugate-transpose vt))
-                                        (make-identity n ',type)))
-                              (is-true (array-approx-p
-                                        (em:mult
-                                         (em:mult u ,(if complexp '(convert-to-complex s) 's))
-                                         vt)
-                                        a)))))))))
+                        for m   = (+ (random 100) 2)
+                        for n   = (+ (random 100) 2)
+                        for min = (min m n)
+                        for a   = (random-matrix m n ',type) do
+                          (flet ((%test (compactp u s vt)
+                                   (let ((s (if compactp
+                                                (from-diag s min min)
+                                                (from-diag s m n))))
+                                     (is-true (array-approx-p
+                                               (em:mult (conjugate-transpose u) u)
+                                               (make-identity (if compactp min m) ',type)))
+                                     (is-true (array-approx-p
+                                               (em:mult vt (conjugate-transpose vt))
+                                               (make-identity (if compactp min n) ',type)))
+                                     (is-true (array-approx-p
+                                               (em:mult
+                                                (em:mult
+                                                 u ,(if complexp '(convert-to-complex s) 's))
+                                                vt)
+                                               a)))))
+                            (multiple-value-call #'%test nil (em:svd a :compact nil))
+                            (multiple-value-call #'%test   t (em:svd a :compact t))))))))
   (def-svd-test single-float)
   (def-svd-test double-float)
   (def-svd-test (complex single-float))
