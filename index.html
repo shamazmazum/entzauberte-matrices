@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+  Overview &ndash; entzauberte-matrices: A lightweight LAPACK wrapper
+</title>
+    <link rel="stylesheet" href="static/style.css"/>
+    
+  <link rel="stylesheet" href="static/highlight.css"/>
+  <script src="static/highlight.js"></script>
+  <script src="static/load-mathjax.js" async></script>
+  <style>
+   /* Highlight the current top-level TOC item, and hide the TOC of all other items */
+
+   .toc a[data-node="index"] {
+       /*color: #AD3108;*/
+   }
+
+   .toc ol {
+       display: none;
+   }
+
+   .toc li a[data-node="index"] {
+       font-weight: bold;
+   }
+
+   .toc li a[data-node="index"] + ol {
+       display: block;
+   }
+
+   .toc li a[data-node="index"] + ol li {
+       margin-left: 10px;
+   }
+  </style>
+
+  </head>
+  <body>
+    
+  <h1 class="doc-title">entzauberte-matrices: A lightweight LAPACK wrapper</h1>
+  <article id="article" data-section="index">
+    <aside>
+      <ol class="toc"><li><a href="index.html" data-node="index">Overview</a></li><li><a href="api.html" data-node="api">API</a></li></ol>
+    </aside>
+    <main class="codex-section">
+      <header>
+        <h2 class="section-title">Overview</h2>
+      </header>
+      <div class="content">
+        <p>
+   Entzauberte (something like &quot;disenchanted&quot;) matrices is a lightweight wrapper
+   around LAPACK. It can add/multiply/invert matrices, has a solver for systems
+   of linear equations and can perform basic matrix decompositions.</p><p>   In contrast to MAGICL, entzauberte-matrices operates on usual Common Lisp
+   arrays with real or complex floating points elements, more precisely on
+   arrays of type <code>(simple-array TYPE 2)</code> where <code>TYPE</code> is one of
+   <code>single-float</code>/<code>double-float</code>/<code>(complex single-float)</code>/<code>(complex
+   double-float)</code>. For binary operations, both arguments must have the same
+   type.</p><p>   Currently, entzauberte-matrices is SBCL only library. It requires OpenBLAS to
+   work.
+</p>
+      </div>
+    </main>
+  </article>
+  <footer>
+    <div class="info">
+      Created with <a href="https://github.com/CommonDoc/codex">Codex</a>.
+    </div>
+  </footer>
+  <script>
+   HighlightLisp.highlight_auto();
+  </script>
+
+  </body>
+</html>
