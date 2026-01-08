@@ -103,6 +103,33 @@
              (values (mat *) (vec *) (mat *) &optional))
 (declaim (inline svd))
 (defun svd (m &key compact)
+  "Do the singular value decomposition of a matrix \\(M = U\\Sigma
+V^T\\). Matrices \\(U\\), \\(\\Sigma\\) and \\(V^T\\) are returned in
+three values. For a matrix \\(m\\times n\\) and \\(r = \\min(m, n)\\),
+if @c(:compact) is @c(NIL) then \\(U\\) is an orthogonal \\(m \\times
+m\\) matrix, \\(V^T\\) is an orthogonal \\(n \\times n\\) matrix and
+\\(\\Sigma\\) is a vector of the length \\(r\\), so that in pseudocode
+
+@begin[lang=lisp](code)
+(multiple-value-bind (U Σ VT)
+    (svd m)
+  (approx= (mult U (mult (from-diag Σ m n) VT)) m))
+@end(code)
+
+is @c(T). If @c(:compact) is @c(T) then \\(U\\) is a semi-orthogonal
+\\(m \\times r\\) matrix, \\(V^T\\) is a semi-orthogonal \\(r \\times
+n\\) matrix and \\(\\Sigma\\) is as with @c(:compact) being @c(NIL), so
+that in pseudocode
+
+@begin[lang=lisp](code)
+(multiple-value-bind (U Σ VT)
+    (svd m)
+  (let ((r (min (array-dimension m 0)
+                (array-dimension m 1))))
+    (approx= (mult U (mult (from-diag Σ r r) VT)) m)))
+@end(code)
+
+is @c(T)."
   (funcall
    (cond
      ((eq (array-element-type m) 'single-float)

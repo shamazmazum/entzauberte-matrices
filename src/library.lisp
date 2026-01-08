@@ -20,8 +20,13 @@
    :from-end t))
 
 ;; Utility function to tell OpenMP not to use all available CPU resources
-(cffi:defcfun ("omp_set_num_threads" set-num-threads) :void
+(cffi:defcfun ("omp_set_num_threads" %set-num-threads) :void
   (num-threads :int))
+
+(declaim (inline set-num-threads))
+(defun set-num-threads (n)
+  "Set a number of threads for OpenBLAS."
+  (%set-num-threads n))
 
 ;; Useful types
 (deftype mat (type) `(simple-array ,type 2))
@@ -63,16 +68,20 @@
     new-indices))
 
 (define-condition lapack-error (error)
-  ((message :type     string
-            :initarg  :message
-            :reader   error-message)
-   (info    :type     (or integer null)
-            :initform nil
-            :initarg  :info
-            :reader   error-info))
+  ((message :type          string
+            :initarg       :message
+            :reader        error-message
+            :documentation "A message")
+   (info    :type          (or integer null)
+            :initform      nil
+            :initarg       :info
+            :reader        error-info
+            :documentation "A code returned by LAPACK"))
   (:report
    (lambda (c s)
      (format s "LAPACK error: ~a " (error-message c))
      (let ((info (error-info c)))
        (when info
-         (format s "INFO: ~d" info))))))
+         (format s "INFO: ~d" info)))))
+  (:documentation "An error condition which is signaled with a
+descriptive message when LAPACK fails to do its job."))

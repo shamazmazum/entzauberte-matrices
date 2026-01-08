@@ -175,6 +175,18 @@
              (values (vec *) (mat *) &optional))
 (declaim (inline eig))
 (defun eig (m)
+  "Compute eigenvalues (the first returned value) and eigenvectors
+(the second returned value) of \\(M\\). Eigenvectors are stored
+@b(in rows), so that (in pseudo-code)
+
+@begin[lang=lisp](code)
+(multiple-value-bind (vals vecs)
+    (eig m)
+  (approx= (mult vecs (to-complex m))
+           (mult (to-complex (from-diag vals)) vecs)))
+@end(code)
+
+is @c(T)."
   (assert (= (array-dimension m 0)
              (array-dimension m 1)))
   (cond

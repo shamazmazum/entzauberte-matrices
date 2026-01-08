@@ -86,13 +86,16 @@
 (serapeum:-> mult ((mat *) (mat *) &key (:ta boolean) (:tb boolean) (:scale number))
              (values (mat *) &optional))
 (declaim (inline mult))
-(defun mult (a b &key ta tb scale)
+(defun mult (a b &key ta tb (scale (coerce 1 (array-element-type a))))
+  "Compute \\(s \\hat{A}\\hat{B}\\) where \\(\\hat{A}\\)
+(resp. \\(\\hat{B}\\)) is \\(A\\) (resp. \\(B\\)) if @c(:ta)
+(resp. @c(:tb)) is @c(nil) and \\(A^T\\) (resp. \\(B^T\\)) otherwise
+and \\(s\\) is a scalar."
   (unless (= (array-dimension a (if ta 0 1))
              (array-dimension b (if tb 1 0)))
     (error "Cannot multiply: matrices have incompatible dimensions"))
-  (let* ((t1 (array-element-type a))
-         (t2 (array-element-type b))
-         (scale (if scale scale (coerce 1 t1))))
+  (let ((t1 (array-element-type a))
+        (t2 (array-element-type b)))
     (funcall
      (cond
        ((and (eq t1 'single-float)

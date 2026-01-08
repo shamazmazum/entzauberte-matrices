@@ -131,6 +131,18 @@
              (values (vec *) (mat *) &optional))
 (declaim (inline eig-self-adjoint))
 (defun eig-self-adjoint (m where)
+  "Compute eigenvalues (the first returned value) and eigenvectors
+(the second returned value) of a self-adjoint matrix
+\\(M\\). Eigenvectors are stored @b(in rows), so that (in pseudo-code)
+
+@begin[lang=lisp](code)
+(multiple-value-bind (vals vecs)
+    (eig m)
+  (approx= (mult vecs m)
+           (mult (from-diag vals) vecs)))
+@end(code)
+
+is @c(T)."
   (assert (= (array-dimension m 0)
              (array-dimension m 1)))
   (funcall

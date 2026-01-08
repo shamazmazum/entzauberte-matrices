@@ -2,6 +2,8 @@
 
 (declaim (inline transpose))
 (defun transpose (m)
+  "Transpose a matrix \\(M\\) (slow for big matrices, avoid this
+function if possible)."
   (let ((res (make-array (reverse (array-dimensions m))
                          :element-type (array-element-type m))))
     (loop for i below (array-dimension m 0) do
@@ -65,20 +67,22 @@
 (serapeum:-> solve ((mat *) (mat *))
              (values (mat *) &optional))
 (declaim (inline solve))
-(defun solve (m b)
-  (assert (= (array-dimension m 0)
-             (array-dimension m 1)
+(defun solve (a b)
+  "Solve an equation \\(AX = B\\). This function uses @c(transpose)
+internally."
+  (assert (= (array-dimension a 0)
+             (array-dimension a 1)
              (array-dimension b 0)))
   (funcall
    (cond
-     ((eq (array-element-type m) 'single-float)
+     ((eq (array-element-type a) 'single-float)
       #'solve-rs-unsafe)
-     ((eq (array-element-type m) 'double-float)
+     ((eq (array-element-type a) 'double-float)
       #'solve-rd-unsafe)
-     ((equalp (array-element-type m) '(complex single-float))
+     ((equalp (array-element-type a) '(complex single-float))
       #'solve-cs-unsafe)
-     ((equalp (array-element-type m) '(complex double-float))
+     ((equalp (array-element-type a) '(complex double-float))
       #'solve-cd-unsafe)
      (t
       (error "Cannot solve an equation: unknown array element type")))
-   m b))
+   a b))

@@ -1,0 +1,34 @@
+@begin[ref=index](section)
+   @title(Overview)
+   Entzauberte (something like "disenchanted") matrices is a lightweight wrapper
+   around LAPACK. It can add/multiply/invert matrices, has a solver for systems
+   of linear equations and can perform basic matrix decompositions.
+
+   In contrast to MAGICL, entzauberte-matrices operates on usual Common Lisp
+   arrays with real or complex floating points elements, more precisely on
+   arrays of type @c((simple-array TYPE 2)) where @c(TYPE) is one of
+   @c(single-float)/@c(double-float)/@c((complex single-float))/@c((complex
+   double-float)). For binary operations, both arguments must have the same
+   type.
+
+   Currently, entzauberte-matrices is SBCL only library. It requires OpenBLAS to
+   work.
+@end(section)
+
+@begin(section)
+   @title(API)
+   @cl:with-package[name="entzauberte-matrices"](
+       @cl:doc(function add)
+       @cl:doc(function scale)
+       @cl:doc(function mult)
+       @cl:doc(function det)
+       @cl:doc(function invert)
+       @cl:doc(function eig)
+       @cl:doc(function eig-self-adjoint)
+       @cl:doc(function svd)
+       @cl:doc(function transpose)
+       @cl:doc(function solve)
+       @cl:doc(function set-num-threads)
+       @cl:doc(condition lapack-error)
+     )
+@end(section)

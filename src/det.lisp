@@ -3,7 +3,7 @@
 (serapeum:-> inversions ((simple-array (unsigned-byte 32) (*)))
              (values unsigned-byte &optional))
 (defun inversions (ipiv)
-  "Return the number of inversions in permutation array"
+  "Return the number of inversions in a permutation array"
   (declare (optimize (speed 3)))
   (let ((result 0)
         (length (length ipiv)))
@@ -39,6 +39,7 @@
              (values number &optional))
 (declaim (inline det))
 (defun det (m)
+  "Compute \\(\\det (M)\\) using \\(LU\\) factorization."
   (unless (= (array-dimension m 0)
              (array-dimension m 1))
     (error "The matrix is not square"))
