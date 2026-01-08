@@ -41,6 +41,15 @@ lisp."
                  (* c2 (row-major-aref m2 i))))))
     result))
 
+(serapeum:-> sub ((mat-or-vec *) (mat-or-vec *))
+             (values (mat-or-vec *) &optional))
+(declaim (inline sub))
+(defun sub (m1 m2)
+  "Compute \\(m_1 - m_2\\). A special case of @c(add)."
+  (add m1 m2
+       :c1 (coerce +1 (array-element-type m1))
+       :c2 (coerce -1 (array-element-type m1))))
+
 ;; This is really trivial
 (serapeum:-> scale ((mat-or-vec *) number)
              (values (mat-or-vec *) &optional))
