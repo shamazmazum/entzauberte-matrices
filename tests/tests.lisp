@@ -143,20 +143,23 @@
   (def-addition-test (complex single-float))
   (def-addition-test (complex double-float)))
 
-(test scale-matrix
-  (loop repeat 100
-        for n = (+ (random 100) 20)
-        for m = (+ (random 100) 20)
-        for mat = (random-matrix m n 'single-float)
-        for s = (random 1.0) do
-          (is-true (array-approx-p (scale mat s) (em:scale mat s)))))
-
-(test scale-vector
-  (loop repeat 100
-        for n = (+ (random 100) 20)
-        for v = (random-vector n 'single-float)
-        for s = (random 1.0) do
-          (is-true (array-approx-p (scale v s) (em:scale v s)))))
+(macrolet ((def-scale-test (type)
+             (let* ((complexp (listp type))
+                    (name (intern
+                           (if complexp
+                               (format nil "SCALE/COMPLEX-~a" (second type))
+                               (format nil "SCALE/~a" type)))))
+               `(test ,name
+                  (loop repeat 100
+                        for n = (+ (random 100) 20)
+                        for m = (+ (random 100) 20)
+                        for mat = (random-matrix m n ',type)
+                        for s = (random-number ',type) do
+                          (is-true (array-approx-p (scale mat s) (em:scale mat s))))))))
+  (def-scale-test single-float)
+  (def-scale-test double-float)
+  (def-scale-test (complex single-float))
+  (def-scale-test (complex double-float)))
 
 (in-suite det)
 

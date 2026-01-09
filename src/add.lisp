@@ -51,8 +51,9 @@
 (serapeum:-> add ((mat-or-vec *) (mat-or-vec *) &optional number)
              (values (smat-or-svec *) &optional))
 (defun add (m1 m2 &optional (s (coerce 1 (array-element-type m1))))
-  "Compute \\(s m_1 + m_2\\). By default \\(s\\) is \\(1\\). Works
-also for vectors."
+  "Compute \\(s m_1 + m_2\\) where \\(s\\) is a scalar and \\(m_1\\)
+and \\(m_2\\) are two matrices of vectors.. By default \\(s\\) is
+\\(1\\)."
   (unless (or (and (= (array-rank m1)
                       (array-rank m2) 2)
                    (= (array-dimension m1 0)

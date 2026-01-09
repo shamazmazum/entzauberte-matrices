@@ -9,7 +9,7 @@
                  (:file "array-storage-vector")
                  (:file "library")
                  (:file "add")
-                 (:file "lisp-only")
+                 (:file "scale")
                  (:file "mult")
                  (:file "lu")
                  (:file "det")
