@@ -25,18 +25,23 @@
         (setf (aref res j i) (conjugate (aref m i j)))))
     res))
 
+(declaim (inline random-number))
+(defun random-number (type &optional imagpart-zero)
+  (if (listp type)
+      (complex
+       (random (coerce 1 (second type)))
+       (if imagpart-zero
+           (coerce 0 (second type))
+           (random (coerce 1 (second type)))))
+      (random (coerce 1 type))))
+
 (declaim (inline random-matrix))
 (defun random-matrix (m n type)
   (make-array (list m n)
               :element-type type
               :initial-contents
               (loop repeat m collect
-                    (loop repeat n collect
-                          (if (listp type)
-                              (complex
-                               (random (coerce 1 (second type)))
-                               (random (coerce 1 (second type))))
-                              (random (coerce 1 type)))))))
+                    (loop repeat n collect (random-number type)))))
 
 (declaim (inline random-self-adjoint))
 (defun random-self-adjoint (n type)
@@ -45,13 +50,7 @@
     (loop for i below n do
       (loop for j from i below n do
         (if (<= i j)
-            (let ((v (if (listp type)
-                         (complex
-                          (random (coerce 1 (second type)))
-                          (if (= i j)
-                              (coerce 0 (second type))
-                              (random (coerce 1 (second type)))))
-                         (random (coerce 1 type)))))
+            (let ((v (random-number type (= i j))))
               (setf (aref result i j) v
                     (aref result j i) (conjugate v))))))
     result))
@@ -82,13 +81,13 @@
                     (* (aref a i k) (aref b k j))))))
     result))
 
-(defun add (a b)
+(defun add (a b s)
   (assert (equalp (array-dimensions a) (array-dimensions b)))
   (let ((result (make-array (array-dimensions a))))
     (loop for i below (array-total-size a) do
           (setf (row-major-aref result i)
-                (+ (row-major-aref a i)
-                   (row-major-aref b i))))
+                (+ (* (row-major-aref a i) s)
+                   (* (row-major-aref b i)))))
     result))
 
 (defun scale (v s)
@@ -125,20 +124,24 @@
   (def-multiplication-test (complex single-float))
   (def-multiplication-test (complex double-float)))
 
-(test add-matrices
-  (loop repeat 100
-        for n = (+ (random 100) 20)
-        for m = (+ (random 100) 20)
-        for m1 = (random-matrix m n 'single-float)
-        for m2 = (random-matrix m n 'single-float) do
-          (is-true (array-approx-p (add m1 m2) (em:add m1 m2)))))
-
-(test add-vectors
-  (loop repeat 100
-        for n = (+ (random 100) 20)
-        for v1 = (random-vector n 'single-float)
-        for v2 = (random-vector n 'single-float) do
-          (is-true (array-approx-p (add v1 v2) (em:add v1 v2)))))
+(macrolet ((def-addition-test (type)
+             (let* ((complexp (listp type))
+                    (name (intern
+                           (if complexp
+                               (format nil "ADDITION/COMPLEX-~a" (second type))
+                               (format nil "ADDITION/~a" type)))))
+               `(test ,name
+                  (loop repeat 100
+                        for n = (+ (random 100) 20)
+                        for m = (+ (random 100) 20)
+                        for m1 = (random-matrix m n ',type)
+                        for m2 = (random-matrix m n ',type)
+                        for s  = (random-number ',type) do
+                          (is-true (array-approx-p (add m1 m2 s) (em:add m1 m2 s))))))))
+  (def-addition-test single-float)
+  (def-addition-test double-float)
+  (def-addition-test (complex single-float))
+  (def-addition-test (complex double-float)))
 
 (test scale-matrix
   (loop repeat 100

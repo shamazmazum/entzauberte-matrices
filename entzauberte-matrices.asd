@@ -8,6 +8,7 @@
     :components ((:file "package")
                  (:file "array-storage-vector")
                  (:file "library")
+                 (:file "add")
                  (:file "lisp-only")
                  (:file "mult")
                  (:file "lu")
