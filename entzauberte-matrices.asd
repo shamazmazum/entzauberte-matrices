@@ -6,6 +6,7 @@
     :serial t
     :pathname "src"
     :components ((:file "package")
+                 (:file "array-storage-vector")
                  (:file "library")
                  (:file "lisp-only")
                  (:file "mult")

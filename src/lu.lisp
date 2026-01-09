@@ -20,9 +20,9 @@
 ;; Semi-high-level functions
 (macrolet ((def-lisp-lu (name low-level-fn type)
              `(progn
-                (serapeum:-> ,name ((simple-array ,type 2))
-                             (values (simple-array ,type 2)
-                                     (simple-array (unsigned-byte 32) 1)
+                (serapeum:-> ,name ((mat ,type))
+                             (values (smat ,type)
+                                     (svec (unsigned-byte 32))
                                      integer &optional))
                 (defun ,name (a)
                   (let* (; Number of rows, but our matrix is row-major
@@ -51,7 +51,7 @@
   (def-lisp-lu %lu-cd %zgetrf (complex double-float)))
 
 (serapeum:-> %lu ((mat *))
-             (values (mat *) (vec (unsigned-byte 32)) integer &optional))
+             (values (smat *) (svec (unsigned-byte 32)) integer &optional))
 (declaim (inline %lu))
 (defun %lu (a)
   (cond

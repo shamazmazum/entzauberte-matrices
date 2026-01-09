@@ -27,8 +27,8 @@
 (macrolet ((def-self-adjoint-lisp (name low-level-fn lisp-type foreign-type)
              `(progn
                 (serapeum:-> ,name ((mat ,lisp-type) uplo)
-                             (values (vec ,lisp-type)
-                                     (mat ,lisp-type)
+                             (values (svec ,lisp-type)
+                                     (smat ,lisp-type)
                                      &optional))
                 (defun ,name (a where)
                   (let* ((n (array-dimension a 0))
@@ -78,8 +78,8 @@
              (let ((real-type (second lisp-type)))
                `(progn
                   (serapeum:-> ,name ((mat ,lisp-type) uplo)
-                               (values (vec ,real-type)
-                                       (mat ,lisp-type)
+                               (values (svec ,real-type)
+                                       (smat ,lisp-type)
                                        &optional))
                   (defun ,name (a where)
                     (let* ((n (array-dimension a 0))
@@ -128,7 +128,7 @@
   (def-self-adjoint-lisp eig-self-adjoint-cd-unsafe %zheev (complex double-float) :double))
 
 (serapeum:-> eig-self-adjoint ((mat *) uplo)
-             (values (vec *) (mat *) &optional))
+             (values (svec *) (smat *) &optional))
 (declaim (inline eig-self-adjoint))
 (defun eig-self-adjoint (m where)
   "Compute eigenvalues (the first returned value) and eigenvectors

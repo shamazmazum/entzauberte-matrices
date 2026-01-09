@@ -18,7 +18,7 @@
 
 (macrolet ((def-det (name type)
              `(progn
-                (serapeum:-> ,name ((simple-array ,type 2))
+                (serapeum:-> ,name ((mat ,type))
                              (values ,type &optional))
                 (defun ,name (m)
                   (multiple-value-bind (lu ipiv)

@@ -31,8 +31,8 @@
 (macrolet ((def-eig (name low-level-fn lisp-type foreign-type)
              `(progn
                 (serapeum:-> ,name ((mat ,lisp-type))
-                             (values (vec ,lisp-type)
-                                     (mat ,lisp-type)
+                             (values (svec ,lisp-type)
+                                     (smat ,lisp-type)
                                      &optional))
                 (defun ,name (a)
                   (let* ((n (array-dimension a 0))
@@ -91,8 +91,8 @@
 (macrolet ((def-eig (name low-level-fn lisp-type foreign-type)
              `(progn
                 (serapeum:-> ,name ((mat ,lisp-type))
-                             (values (vec (complex ,lisp-type))
-                                     (mat (complex ,lisp-type))
+                             (values (svec (complex ,lisp-type))
+                                     (smat (complex ,lisp-type))
                                      &optional))
                 (defun ,name (a)
                   (let* ((n (array-dimension a 0))
@@ -172,7 +172,7 @@
   (def-eig eig-rd-unsafe %dgeev double-float :double))
 
 (serapeum:-> eig ((mat *))
-             (values (vec *) (mat *) &optional))
+             (values (svec *) (smat *) &optional))
 (declaim (inline eig))
 (defun eig (m)
   "Compute eigenvalues (the first returned value) and eigenvectors

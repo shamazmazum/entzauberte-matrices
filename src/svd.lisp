@@ -30,9 +30,9 @@
                     (real-type (if complexp (second lisp-type) lisp-type)))
                `(progn
                   (serapeum:-> ,name ((mat ,lisp-type) boolean)
-                               (values (mat ,lisp-type)
-                                       (vec ,real-type)
-                                       (mat ,lisp-type)
+                               (values (smat ,lisp-type)
+                                       (svec ,real-type)
+                                       (smat ,lisp-type)
                                        &optional))
                   (defun ,name (a compact)
                     (let* ((m (array-dimension a 1)) ; Number of rows in A^T
@@ -100,7 +100,7 @@
   (def-svd svd-cd %zgesvd (complex double-float) :double))
 
 (serapeum:-> svd ((mat *) &key (:compact boolean))
-             (values (mat *) (vec *) (mat *) &optional))
+             (values (smat *) (svec *) (smat *) &optional))
 (declaim (inline svd))
 (defun svd (m &key compact)
   "Do the singular value decomposition of a matrix \\(M = U\\Sigma

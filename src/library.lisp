@@ -13,7 +13,7 @@
    (lambda (binding acc)
      (destructuring-bind (ptr array)
          binding
-       `(with-pointer-to-vector-data (,ptr (sb-ext:array-storage-vector ,array))
+       `(with-pointer-to-vector-data (,ptr (array-storage-vector ,array))
           ,acc)))
    bindings
    :initial-value `(progn ,@body)
@@ -29,8 +29,12 @@
   (%set-num-threads n))
 
 ;; Useful types
-(deftype mat (type) `(simple-array ,type 2))
-(deftype vec (type) `(simple-array ,type 1))
+(deftype smat (type) `(simple-array ,type 2))
+(deftype svec (type) `(simple-array ,type 1))
+(deftype smat-or-svec (type) `(or (smat ,type) (svec ,type)))
+
+(deftype mat (type) `(array ,type 2))
+(deftype vec (type) `(array ,type 1))
 (deftype mat-or-vec (type) `(or (mat ,type) (vec ,type)))
 
 ;; And another useful function
@@ -38,8 +42,8 @@
 (defun copy-array (a)
   (let ((result (make-array (array-dimensions a)
                             :element-type (array-element-type a))))
-    (replace (sb-ext:array-storage-vector result)
-             (sb-ext:array-storage-vector a))
+    (replace (array-storage-vector result)
+             (array-storage-vector a))
     result))
 
 ;; And another one
@@ -47,7 +51,7 @@
 (defun map-array (f a)
   (let ((result (make-array (array-dimensions a)
                             :element-type (array-element-type a))))
-    (map-into (sb-ext:array-storage-vector result) f (sb-ext:array-storage-vector a))
+    (map-into (array-storage-vector result) f (array-storage-vector a))
     result))
 
 ;; Transform LAPACK "pivot" indices to "normal" permutation matrix indices.

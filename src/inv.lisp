@@ -20,8 +20,8 @@
 (macrolet ((def-inv-lisp (name lisp-type foreign-type lufn invfn)
              (let ((complexp (listp lisp-type)))
                `(progn
-                  (serapeum:-> ,name ((simple-array ,lisp-type 2))
-                               (values (simple-array ,lisp-type 2) &optional))
+                  (serapeum:-> ,name ((mat ,lisp-type))
+                               (values (smat ,lisp-type) &optional))
                   (defun ,name (a)
                     (let* ((n (array-dimension a 0))
                            (lda n)
@@ -66,7 +66,7 @@
   (def-inv-lisp inv-cd-unsafe (complex double-float) :double %zgetrf %zgetri))
 
 (serapeum:-> invert ((mat *))
-             (values (mat *) &optional))
+             (values (smat *) &optional))
 (declaim (inline invert))
 (defun invert (m)
   "Compute \\(M^{-1}\\) using \\(LU\\) factorization."

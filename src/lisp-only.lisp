@@ -6,7 +6,7 @@
 
 (serapeum:-> add ((mat-or-vec *) (mat-or-vec *)
                   &key (:c1 number) (:c2 number))
-             (values (mat-or-vec *) &optional))
+             (values (smat-or-svec *) &optional))
 (declaim (inline add))
 (defun add (m1 m2 &key
                     (c1 (coerce 1 (array-element-type m1)))
@@ -35,14 +35,14 @@ lisp."
     ;; I hope someday this declaration wouldn't be needed.
     (locally
         (declare (optimize (sb-c:insert-array-bounds-checks 0)))
-      (loop for i below (array-total-size m1) do
+      (loop for i below (array-total-size result) do
         (setf (row-major-aref result i)
               (+ (* c1 (row-major-aref m1 i))
                  (* c2 (row-major-aref m2 i))))))
     result))
 
 (serapeum:-> sub ((mat-or-vec *) (mat-or-vec *))
-             (values (mat-or-vec *) &optional))
+             (values (smat-or-svec *) &optional))
 (declaim (inline sub))
 (defun sub (m1 m2)
   "Compute \\(m_1 - m_2\\). A special case of @c(add)."
@@ -52,7 +52,7 @@ lisp."
 
 ;; This is really trivial
 (serapeum:-> scale ((mat-or-vec *) number)
-             (values (mat-or-vec *) &optional))
+             (values (smat-or-svec *) &optional))
 (declaim (inline scale))
 (defun scale (v s)
   "Compute \\(sv\\) where \\(s\\) is a scalar and \\(v\\) is a vector

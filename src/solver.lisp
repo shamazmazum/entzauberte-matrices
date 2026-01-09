@@ -34,7 +34,7 @@ function if possible)."
              `(progn
                 (serapeum:-> ,name ((mat ,lisp-type)
                                     (mat ,lisp-type))
-                             (values (mat ,lisp-type) &optional))
+                             (values (smat ,lisp-type) &optional))
                 (defun ,name (a b)
                   (let ((acopy (transpose a))
                         (bcopy (transpose b))
@@ -65,7 +65,7 @@ function if possible)."
   (def-solve solve-cd-unsafe %zgesv (complex double-float)))
 
 (serapeum:-> solve ((mat *) (mat *))
-             (values (mat *) &optional))
+             (values (smat *) &optional))
 (declaim (inline solve))
 (defun solve (a b)
   "Solve an equation \\(AX = B\\). This function uses @c(transpose)
