@@ -15,7 +15,6 @@
                       (incf result))))
     result))
 
-
 (macrolet ((def-det (name type)
              `(progn
                 (serapeum:-> ,name ((mat ,type))

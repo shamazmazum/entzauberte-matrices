@@ -12,9 +12,8 @@ function if possible)."
     res))
 
 (macrolet ((def-solver-low-level (name)
-             (let* ((name (symbol-name name))
-                    (lisp-name (intern (format nil "%~a" name)))
-                    (foreign-name (format nil "~a_" (string-downcase name))))
+             (multiple-value-bind (lisp-name foreign-name)
+                 (wrapper-names name)
                `(defcfun (,lisp-name ,foreign-name) :void
                   (n    (:pointer :int))
                   (nrhs (:pointer :int))

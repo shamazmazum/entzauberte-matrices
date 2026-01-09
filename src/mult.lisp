@@ -6,9 +6,8 @@
   (if cond (array-dimension a a1) (array-dimension a a2)))
 
 (macrolet ((define-foreign-mult (name foreign-type)
-             (let* ((name (symbol-name name))
-                    (lisp-name (intern (format nil "%~a" name)))
-                    (fortran-name (format nil "~a_" (string-downcase name))))
+             (multiple-value-bind (lisp-name fortran-name)
+                 (wrapper-names name)
                `(defcfun (,lisp-name ,fortran-name) :void
                   (transa (:pointer :uint8))
                   (transb (:pointer :uint8))

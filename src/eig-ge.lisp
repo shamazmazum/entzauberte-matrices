@@ -1,9 +1,8 @@
 (in-package :entzauberte-matrices)
 
 (macrolet ((def-eig-low-level (name complexp)
-             (let* ((name (symbol-name name))
-                    (lisp-name (intern (format nil "%~a" name)))
-                    (foreign-name (format nil "~a_" (string-downcase name))))
+             (multiple-value-bind (lisp-name foreign-name)
+                 (wrapper-names name)
                `(defcfun (,lisp-name ,foreign-name) :void
                   (jobvl (:pointer :char))
                   (jobvr (:pointer :char))
