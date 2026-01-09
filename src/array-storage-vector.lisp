@@ -1,7 +1,8 @@
 (in-package :entzauberte-matrices)
 
 (sb-c:defknown array-storage-vector (array) (simple-array * (*))
-    (sb-c:flushable sb-c::recursive))
+    (sb-c:flushable sb-c::recursive)
+  :overwrite-fndb-silently t)
 
 (defun array-storage-vector (a)
   "This is like SB-EXT:ARRAY-STORAGE-VECTOR, but works also with
