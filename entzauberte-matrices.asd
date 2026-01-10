@@ -10,6 +10,7 @@
                  (:file "library")
                  (:file "add")
                  (:file "scale")
+                 (:file "dot")
                  (:file "mult")
                  (:file "lu")
                  (:file "det")

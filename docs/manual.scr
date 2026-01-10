@@ -18,6 +18,8 @@
 @begin(section)
    @title(API)
    @cl:with-package[name="entzauberte-matrices"](
+       @cl:doc(function dot)
+       @cl:doc(function norm)
        @cl:doc(function add)
        @cl:doc(function sub)
        @cl:doc(function scale)

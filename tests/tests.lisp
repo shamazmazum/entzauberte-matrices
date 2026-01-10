@@ -1,5 +1,6 @@
 (in-package :entzauberte-matrices/tests)
 
+(def-suite dot     :description "Dot product")
 (def-suite algebra :description "Algebraic operations")
 (def-suite det     :description "Determinant")
 (def-suite inv     :description "Inversion")
@@ -14,7 +15,7 @@
                    (let ((status (run suite)))
                      (explain! status)
                      (results-status status)))
-                 '(algebra det inv eig svd solver))))
+                 '(dot algebra det inv eig svd solver))))
 
 (declaim (inline conjugate-transpose))
 (defun conjugate-transpose (m)
@@ -67,6 +68,28 @@
                          (random (coerce 1 (second type)))
                          (random (coerce 1 (second type))))
                         (random (coerce 1 type))))))
+
+(in-suite dot)
+
+(declaim (inline dot))
+(defun dot (v1 v2)
+  (assert (= (length v1) (length v2)))
+  (loop for i below (length v1) sum
+        (* (aref v1 i) (conjugate (aref v2 i)))))
+
+(macrolet ((def-dot-test (type)
+             (let ((name (intern
+                          (if (listp type)
+                              (format nil "DOT/COMPLEX-~a" (second type))
+                              (format nil "DOT/~a" type)))))
+               `(test ,name
+                  (loop repeat 1000
+                        for n  = (+ (random 100) 20)
+                        for v1 = (random-vector n ',type)
+                        for v2 = (random-vector n ',type) do
+                          (is (approxp (dot v1 v2) (em:dot v1 v2))))))))
+  (def-dot-test single-float)
+  (def-dot-test double-float))
 
 (in-suite algebra)
 
