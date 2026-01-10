@@ -1,10 +1,5 @@
 (in-package :entzauberte-matrices)
 
-(declaim (inline %array-dimension))
-(defun %array-dimension (a cond a1 a2)
-  "If COND then (array-dimension a a1) else (array-dimension a a2)"
-  (if cond (array-dimension a a1) (array-dimension a a2)))
-
 (macrolet ((define-foreign-mult (name foreign-type)
              (multiple-value-bind (lisp-name fortran-name)
                  (wrapper-names name)
@@ -38,8 +33,8 @@
                                                  boolean boolean ,lisp-type)
                                (values (smat ,lisp-type) &optional))
                   (defun ,high-level-name (a b ta tb scale)
-                    (let ((c (make-array (list (%array-dimension a ta 1 0)
-                                               (%array-dimension b tb 0 1))
+                    (let ((c (make-array (list (array-dimension a (if ta 1 0))
+                                               (array-dimension b (if tb 0 1)))
                                          :element-type ',lisp-type)))
                       (with-array-pointers ((aptr a)
                                             (bptr b)
@@ -54,9 +49,9 @@
                                                (ldb    :int)
                                                (beta   ,foreign-type ,@(if complexp '(2)))
                                                (ldc    :int))
-                          (let ((m (%array-dimension b tb 0 1))
-                                (n (%array-dimension a ta 1 0))
-                                (k (%array-dimension b tb 1 0)))
+                          (let ((m (array-dimension b (if tb 0 1)))
+                                (n (array-dimension a (if ta 1 0)))
+                                (k (array-dimension b (if tb 1 0))))
                             (setf (mem-ref transa :uint8) (char-code (if tb #\t #\n))
                                   (mem-ref transb :uint8) (char-code (if ta #\t #\n))
                                   (mem-ref mptr :int) m
