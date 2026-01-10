@@ -31,6 +31,8 @@
        @cl:doc(function svd)
        @cl:doc(function transpose)
        @cl:doc(function solve)
+       @cl:doc(function reshape)
+       @cl:doc(function reshape-unsafe)
        @cl:doc(function set-num-threads)
        @cl:doc(condition lapack-error)
      )

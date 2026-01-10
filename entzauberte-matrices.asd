@@ -7,6 +7,7 @@
     :pathname "src"
     :components ((:file "package")
                  (:file "array-storage-vector")
+                 (:file "reshape")
                  (:file "library")
                  (:file "add")
                  (:file "scale")

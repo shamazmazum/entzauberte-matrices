@@ -1,6 +1,7 @@
 (defpackage entzauberte-matrices
   (:use #:cl #:cffi)
   (:export #:lapack-error
+           #:reshape #:reshape-unsafe
            #:dot #:norm
            #:mult #:add #:sub #:scale
            #:det #:inversions #:invert

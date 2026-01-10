@@ -7,6 +7,7 @@
 (def-suite eig     :description "Eigenvalue decomposition")
 (def-suite svd     :description "SVD decomposition")
 (def-suite solver  :description "Solver")
+(def-suite misc    :description "Other stuff")
 
 (defun run-tests ()
   (em:set-num-threads 4)
@@ -15,7 +16,7 @@
                    (let ((status (run suite)))
                      (explain! status)
                      (results-status status)))
-                 '(dot algebra det inv eig svd solver))))
+                 '(dot algebra det inv eig svd solver misc))))
 
 (declaim (inline conjugate-transpose))
 (defun conjugate-transpose (m)
@@ -390,3 +391,16 @@
   (def-solver-test double-float)
   (def-solver-test (complex single-float))
   (def-solver-test (complex double-float)))
+
+(in-suite misc)
+
+(test reshape
+  (loop repeat 1000
+        for n  = (+ (random 100) 20)
+        for v1 = (random-vector n 'single-float)
+        for v2 = (random-vector n 'single-float) do
+          (is (approxp (em:dot v1 v2)
+                       (aref
+                        (em:mult (em:reshape-unsafe v1 (list 1 n))
+                                 (em:reshape-unsafe v2 (list n 1)))
+                        0 0)))))
