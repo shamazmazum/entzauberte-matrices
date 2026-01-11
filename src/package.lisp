@@ -2,6 +2,7 @@
   (:use #:cl #:cffi)
   (:export #:lapack-error
            #:reshape #:reshape-unsafe
+           #:row #:column #:vstack #:hstack
            #:dot #:norm
            #:mult #:add #:sub #:scale
            #:det #:inversions #:invert

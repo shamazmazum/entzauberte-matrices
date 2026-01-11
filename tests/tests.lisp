@@ -404,3 +404,19 @@
                         (em:mult (em:reshape-unsafe v1 (list 1 n))
                                  (em:reshape-unsafe v2 (list n 1)))
                         0 0)))))
+
+(test stack
+  (loop repeat 1000
+        for r  = (+ (random 100) 20)
+        for c1 = (+ (random 100) 20)
+        for c2 = (+ (random 100) 20)
+        for c3 = (+ (random 100) 20)
+        for m1 = (random-matrix r c1 'single-float)
+        for m2 = (random-matrix r c2 'single-float)
+        for m3 = (random-matrix r c3 'single-float) do
+          (is-true
+           (equalp (em:transpose (em:hstack (list m1 m2 m3) 'single-float))
+                   (em:vstack (list (em:transpose m1)
+                                    (em:transpose m2)
+                                    (em:transpose m3))
+                              'single-float)))))
