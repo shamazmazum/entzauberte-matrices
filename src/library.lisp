@@ -19,14 +19,22 @@
    :initial-value `(progn ,@body)
    :from-end t))
 
-;; Utility function to tell OpenMP not to use all available CPU resources
-(cffi:defcfun ("omp_set_num_threads" %set-num-threads) :void
+;; Utility function to tell OpenBLAS not to use all available CPU
+;; resources.
+(cffi:defcfun ("goto_set_num_threads" %goto-set-num-threads) :void
+  (num-threads :int))
+(cffi:defcfun ("openblas_set_num_threads" %openblas-set-num-threads) :void
+  (num-threads :int))
+(cffi:defcfun ("omp_set_num_threads" %omp-set-num-threads) :void
   (num-threads :int))
 
 (declaim (inline set-num-threads))
 (defun set-num-threads (n)
   "Set a number of threads for OpenBLAS."
-  (%set-num-threads n))
+  (%openblas-set-num-threads n)
+  (%goto-set-num-threads     n)
+  (when (foreign-symbol-pointer "omp_set_num_threads")
+    (%omp-set-num-threads    n)))
 
 ;; Useful types
 (deftype smat (type) `(simple-array ,type 2))
