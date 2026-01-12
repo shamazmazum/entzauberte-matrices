@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 0.1.1
+
+* Improvement: Add benchmarks
+* Bug fix: Fix `set-num-threads` so that SBCL won't crash on exit in some rare
+  circumstances.
+
 ## Version 0.1
 
 * Incompatible change: Specialized LAPACK wrappers are now total. This means
