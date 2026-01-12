@@ -54,7 +54,7 @@
    around LAPACK. It can add/multiply/invert matrices, has a solver for systems
    of linear equations and can perform basic matrix decompositions.</p><p>   In contrast to MAGICL, entzauberte-matrices operates on usual Common Lisp
    arrays with real or complex floating points elements, more precisely on
-   arrays of type <code>(simple-array TYPE 2)</code> where <code>TYPE</code> is one of
+   arrays of type <code>(array TYPE 2)</code> where <code>TYPE</code> is one of
    <code>single-float</code>/<code>double-float</code>/<code>(complex single-float)</code>/<code>(complex
    double-float)</code>. For binary operations, both arguments must have the same
    type.</p><p>   Currently, entzauberte-matrices is SBCL only library. It requires OpenBLAS to

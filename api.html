@@ -51,31 +51,41 @@
       <div class="content">
         
    
-       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">add</code><code class="codex-lambda-list">(m1 m2 &amp;key (c1 (coerce 1 (array-element-type m1))) (c2 (coerce 1 (array-element-type m2))))</code><div class="codex-docstring">Compute \(c_1 m_1 + c_2 m_2\). By default \(c_1\) and \(c_2\)
-are \(1\). Works also for vectors. This function is implemented in
-lisp.</div></div>
-       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">scale</code><code class="codex-lambda-list">(v s)</code><div class="codex-docstring">Compute \(sv\) where \(s\) is a scalar and \(v\) is a vector
-or a matrix. This function is implemented in lisp.</div></div>
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">dot</code><code class="codex-lambda-list">(v1 v2)</code><div class="codex-docstring">Compute the dot product \(\langle v_1, v_2 \rangle = \sum_i {v_1}_i
+\overline{{v_2}_i}\).</div></div>
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">norm</code><code class="codex-lambda-list">(v)</code><div class="codex-docstring">Compute the norm of \(v\), i.e. \(\sqrt{\langle v, v\rangle}\).</div></div>
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">add</code><code class="codex-lambda-list">(m1 m2 &amp;optional (s (coerce 1 (array-element-type m1))))</code><div class="codex-docstring">Compute \(s m_1 + m_2\) where \(s\) is a scalar and \(m_1\)
+and \(m_2\) are two matrices of vectors.. By default \(s\) is
+\(1\).</div></div>
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">sub</code><code class="codex-lambda-list">(m1 m2)</code><div class="codex-docstring">Compute \(m_1 - m_2\). A special case of <code>add</code>.</div></div>
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">scale</code><code class="codex-lambda-list">(m s)</code><div class="codex-docstring">Compute \(s m\) where \(s\) is a scalar and \(m\) is a matrix
+or a vector.</div></div>
        <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">mult</code><code class="codex-lambda-list">(a b &amp;key ta tb (scale (coerce 1 (array-element-type a))))</code><div class="codex-docstring">Compute \(s \hat{A}\hat{B}\) where \(\hat{A}\)
 (resp. \(\hat{B}\)) is \(A\)(resp. \(B\)) if <code>:ta</code>
 (resp. <code>:tb</code>) is <code>nil</code> and \(A^T\)(resp. \(B^T\)) otherwise
 and \(s\) is a scalar.</div></div>
-       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">det</code><code class="codex-lambda-list">(m)</code><div class="codex-docstring">Compute \(\det (M)\) using \(LU\) factorization.</div></div>
-       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">invert</code><code class="codex-lambda-list">(m)</code><div class="codex-docstring">Compute \(M^{-1}\) using \(LU\) factorization.</div></div>
-       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">eig</code><code class="codex-lambda-list">(m)</code><div class="codex-docstring"><p>Compute eigenvalues (the first returned value) and eigenvectors
-(the second returned value) of \(M\). Eigenvectors are stored
-<b>in rows</b>, so that (in pseudo-code)</p><pre><code class="lisp">(multiple-value-bind (vals vecs)
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">det</code><code class="codex-lambda-list">(m)</code><div class="codex-docstring">Compute \(\det (M)\) using \(LU\) factorization. Returns
+<code>(values det infocode)</code> where <code>det</code> can be <code>null</code> if \(LU\)
+factorization fails.</div></div>
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">invert</code><code class="codex-lambda-list">(m)</code><div class="codex-docstring">Compute \(M^{-1}\) using \(LU\) factorization. Returns
+<code>(values inv infocode)</code> where <code>inv</code> can be <code>null</code> if \(LU\)
+factoirization or inversion routine fails.</div></div>
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">eig</code><code class="codex-lambda-list">(m)</code><div class="codex-docstring"><p>Compute eigenvalues and eigenvectors of \(M\). Eigenvectors are
+stored <b>in rows</b>, so that (in pseudo-code)</p><pre><code class="lisp">(multiple-value-bind (vals vecs)
     (eig m)
   (approx= (mult vecs (to-complex m))
            (mult (to-complex (from-diag vals)) vecs)))
-</code></pre><p>is <code>T</code>.</p></div></div>
-       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">eig-self-adjoint</code><code class="codex-lambda-list">(m where)</code><div class="codex-docstring"><p>Compute eigenvalues (the first returned value) and eigenvectors
-(the second returned value) of a self-adjoint matrix
+</code></pre><p>is <code>T</code>. The returned values <code>vals</code> and <code>vecs</code> may be <code>null</code> if
+the decomposition fails. The third returned value is the info code
+returned by LAPACK.</p></div></div>
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">eig-self-adjoint</code><code class="codex-lambda-list">(m where)</code><div class="codex-docstring"><p>Compute eigenvalues and eigenvectors of a self-adjoin matrix
 \(M\). Eigenvectors are stored <b>in rows</b>, so that (in pseudo-code)</p><pre><code class="lisp">(multiple-value-bind (vals vecs)
     (eig m)
   (approx= (mult vecs m)
            (mult (from-diag vals) vecs)))
-</code></pre><p>is <code>T</code>.</p></div></div>
+</code></pre><p>is <code>T</code>. The returned values <code>vals</code> and <code>vecs</code> may be <code>null</code> if
+the decomposition fails. The third returned value is the info code
+returned by LAPACK.</p></div></div>
        <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">svd</code><code class="codex-lambda-list">(m &amp;key compact)</code><div class="codex-docstring"><p>Do the singular value decomposition of a matrix \(M = U\Sigma
 V^T\). Matrices \(U\), \(\Sigma\) and \(V^T\) are returned in
 three values. For a matrix \(m\times n\) and \(r = \min(m, n)\),
@@ -92,14 +102,21 @@ that in pseudocode</p><pre><code class="lisp">(multiple-value-bind (U Σ VT)
   (let ((r (min (array-dimension m 0)
                 (array-dimension m 1))))
     (approx= (mult U (mult (from-diag Σ r r) VT)) m)))
-</code></pre><p>is <code>T</code>.</p></div></div>
+</code></pre><p>is <code>T</code>. The first three returned values may be <code>null</code> if the
+decomposition fails. The fourth value is the info code returned by
+LAPACK.</p></div></div>
        <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">transpose</code><code class="codex-lambda-list">(m)</code><div class="codex-docstring">Transpose a matrix \(M\)(slow for big matrices, avoid this
 function if possible).</div></div>
        <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">solve</code><code class="codex-lambda-list">(a b)</code><div class="codex-docstring">Solve an equation \(AX = B\). This function uses <code>transpose</code>
-internally.</div></div>
+internally. Return <code>(values X infocode)</code> where <code>X</code> may be <code>null</code>
+if the solver fails.</div></div>
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">reshape</code><code class="codex-lambda-list">(m shape)</code><div class="codex-docstring">Reshape an array.</div></div>
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">reshape-unsafe</code><code class="codex-lambda-list">(m shape)</code><div class="codex-docstring">Reshape an array. The new array will share the storage with the argument.</div></div>
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">hstack</code><code class="codex-lambda-list">(ms type)</code><div class="codex-docstring">Concatenate matrices horizontally. The matrices must have the same
+number of rows and the same element type <code>type</code>.</div></div>
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">vstack</code><code class="codex-lambda-list">(ms type)</code><div class="codex-docstring">Concatenate matrices vertically. The matrices must have the same
+number of columns and the same element type <code>type</code>.</div></div>
        <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">set-num-threads</code><code class="codex-lambda-list">(n)</code><div class="codex-docstring">Set a number of threads for OpenBLAS.</div></div>
-       <div class="codex-doc-node codex-record codex-condition"><code class="codex-name">lapack-error</code><div class="codex-docstring">An error condition which is signaled with a
-descriptive message when LAPACK fails to do its job.</div><ul class="codex-slot-list"><li class="codex-slot codex-class-slot"><code class="codex-name">message</code><div class="codex-docstring">A message</div><div class="codex-class-struct-slot-option-node"><table class="codex-class-struct-slot-option-table"><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Allocation</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell">instance</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Type</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">string</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Initarg</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">:message</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Readers</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(error-message)</code></td></tr></table></div></li><li class="codex-slot codex-class-slot"><code class="codex-name">info</code><div class="codex-docstring">A code returned by LAPACK</div><div class="codex-class-struct-slot-option-node"><table class="codex-class-struct-slot-option-table"><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Allocation</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell">instance</td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Type</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(or integer null)</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Initarg</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">:info</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Initform</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">nil</code></td></tr><tr class="codex-class-struct-slot-option-row"><td class="codex-class-struct-slot-option-label-cell">Readers</td><td class="codex-class-struct-slot-option-value-cell codex-class-struct-slot-option-symbol-list-cell"><code class="codex-class-struct-slot-symbol-list">(error-info)</code></td></tr></table></div></li></ul></div>
      
 
       </div>
