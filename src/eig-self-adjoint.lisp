@@ -140,7 +140,7 @@
            (mult (from-diag vals) vecs)))
 @end(code)
 
-is @c(T). The returned values @c(vals) and @c(vecs) may be @c(null) if
+is @c(T). The returned values @c(vals) and @c(vecs) may be @c(NIL) if
 the decomposition fails. The third returned value is the info code
 returned by LAPACK."
   (assert (= (array-dimension m 0)

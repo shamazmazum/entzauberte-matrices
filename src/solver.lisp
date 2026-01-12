@@ -69,7 +69,7 @@ function if possible)."
 (declaim (inline solve))
 (defun solve (a b)
   "Solve an equation \\(AX = B\\). This function uses @c(transpose)
-internally. Return @c((values X infocode)) where @c(X) may be @c(null)
+internally. Return @c((values X infocode)) where @c(X) may be @c(NIL)
 if the solver fails."
   (assert (= (array-dimension a 0)
              (array-dimension a 1)

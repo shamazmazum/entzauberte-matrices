@@ -132,7 +132,7 @@ that in pseudocode
     (approx= (mult U (mult (from-diag Σ r r) VT)) m)))
 @end(code)
 
-is @c(T). The first three returned values may be @c(null) if the
+is @c(T). The first three returned values may be @c(NIL) if the
 decomposition fails. The fourth value is the info code returned by
 LAPACK."
   (funcall

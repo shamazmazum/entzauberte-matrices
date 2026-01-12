@@ -44,7 +44,7 @@
 (declaim (inline det))
 (defun det (m)
   "Compute \\(\\det (M)\\) using \\(LU\\) factorization. Returns
-@c((values det infocode)) where @c(det) can be @c(null) if \\(LU\\)
+@c((values det infocode)) where @c(det) can be @c(NIL) if \\(LU\\)
 factorization fails."
   (unless (= (array-dimension m 0)
              (array-dimension m 1))

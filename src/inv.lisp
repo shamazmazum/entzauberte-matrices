@@ -68,7 +68,7 @@
 (declaim (inline invert))
 (defun invert (m)
   "Compute \\(M^{-1}\\) using \\(LU\\) factorization. Returns
-@c((values inv infocode)) where @c(inv) can be @c(null) if \\(LU\\)
+@c((values inv infocode)) where @c(inv) can be @c(NIL) if \\(LU\\)
 factoirization or inversion routine fails."
   (unless (= (array-dimension m 0)
              (array-dimension m 1))
