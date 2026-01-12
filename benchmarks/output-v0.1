@@ -1,0 +1,433 @@
+entzauberte-matrices vs magicl (also linked against OpenBLAS), 4 threads on
+Ryzen 7 5800X:
+
+Conversion 1000x1000 (magicl)
+-                SAMPLES  TOTAL       MINIMUM   MAXIMUM   MEDIAN    AVERAGE     DEVIATION  
+REAL-TIME        100      6.839422    0.06669   0.148472  0.06688   0.068394    0.00864    
+RUN-TIME         100      6.840128    0.066689  0.148469  0.066879  0.068401    0.008641   
+USER-RUN-TIME    100      6.738178    0.046332  0.117016  0.06688   0.067382    0.005964   
+SYSTEM-RUN-TIME  100      0.102014    0         0.031453  0         0.00102     0.004356   
+PAGE-FAULTS      100      0           0         0         0         0           0.0        
+GC-RUN-TIME      100      16.423      0         2.511     0         0.16423     0.599138   
+BYTES-CONSED     100      5599900368  55941952  56055024  55989504  55999004.0  18304.188  
+EVAL-CALLS       100      0           0         0         0         0           0.0        
+Multiplication 10x10 ⋅ 10x10 (em)
+-                SAMPLES  TOTAL       MINIMUM   MAXIMUM   MEDIAN    AVERAGE    DEVIATION  
+REAL-TIME        1000000  1.591379    0.000001  0.000013  0.000002  0.000002   0.000001   
+RUN-TIME         1000000  1.597032    0.000001  0.000038  0.000002  0.000002   0.000001   
+USER-RUN-TIME    1000000  0.917877    0         0.000302  0.000001  0.000001   0.000003   
+SYSTEM-RUN-TIME  1000000  0.723172    0         0.007584  0         0.000001   0.000073   
+PAGE-FAULTS      1000000  0           0         0         0         0          0.0        
+GC-RUN-TIME      1000000  0           0         0         0         0          0.0        
+BYTES-CONSED     1000000  1052479424  0         130352    0         1052.4794  5755.553   
+EVAL-CALLS       1000000  0           0         0         0         0          0.0        
+Multiplication 10x10 ⋅ 10x10 (magicl)
+-                SAMPLES  TOTAL       MINIMUM   MAXIMUM   MEDIAN    AVERAGE   DEVIATION  
+REAL-TIME        1000000  2.308059    0.000001  0.020503  0.000002  0.000002  0.000021   
+RUN-TIME         1000000  2.337653    0.000002  0.020602  0.000002  0.000002  0.000021   
+USER-RUN-TIME    1000000  1.514905    0         0.019152  0.000002  0.000002  0.00002    
+SYSTEM-RUN-TIME  1000000  0.645504    0         0.007577  0         0.000001  0.000068   
+PAGE-FAULTS      1000000  0           0         0         0         0         0.0        
+GC-RUN-TIME      1000000  20.436      0         20.436    0         0.00002   0.020436   
+BYTES-CONSED     1000000  1076816048  0         65120     0         1076.816  5810.871   
+EVAL-CALLS       1000000  0           0         0         0         0         0.0        
+Multiplication 1000x1000 ⋅ 1000x1000 (em)
+-                SAMPLES  TOTAL       MINIMUM   MAXIMUM   MEDIAN    AVERAGE    DEVIATION  
+REAL-TIME        1000     9.081017    0.008801  0.013472  0.009013  0.009081   0.000315   
+RUN-TIME         1000     34.092663   0.013478  0.057502  0.03487   0.034093   0.004945   
+USER-RUN-TIME    1000     33.569267   0.006385  0.050108  0.034656  0.033569   0.004823   
+SYSTEM-RUN-TIME  1000     0.151481    0         0.030493  0         0.000151   0.001713   
+PAGE-FAULTS      1000     0           0         0         0         0          0.0        
+GC-RUN-TIME      1000     74.642      0         10.264    0         0.074642   0.787547   
+BYTES-CONSED     1000     8000179712  8000016   8032784   8000016   8000179.5  2309.443   
+EVAL-CALLS       1000     0           0         0         0         0          0.0        
+Multiplication 1000x1000 ⋅ 1000x1000 (magicl)
+-                SAMPLES  TOTAL       MINIMUM   MAXIMUM   MEDIAN    AVERAGE    DEVIATION  
+REAL-TIME        1000     9.196909    0.008838  0.040308  0.009073  0.009197   0.001036   
+RUN-TIME         1000     33.833443   0.013563  0.175806  0.034746  0.033833   0.007898   
+USER-RUN-TIME    1000     33.17167    0.002907  0.152681  0.033693  0.033172   0.007819   
+SYSTEM-RUN-TIME  1000     0.396696    0         0.030591  0         0.000397   0.003022   
+PAGE-FAULTS      1000     0           0         0         0         0          0.0        
+GC-RUN-TIME      1000     189.554     0         121.671   0         0.189554   3.90896    
+BYTES-CONSED     1000     8000048768  8000016   8032784   8000016   8000049.0  1035.6969  
+EVAL-CALLS       1000     0           0         0         0         0          0.0        
+Addition 10x10 + 10x10 (em)
+-                SAMPLES  TOTAL       MINIMUM   MAXIMUM   MEDIAN    AVERAGE    DEVIATION  
+REAL-TIME        1000000  1.588568    0.000001  0.039711  0.000001  0.000002   0.00004    
+RUN-TIME         1000000  1.873687    0.000001  0.039847  0.000002  0.000002   0.00004    
+USER-RUN-TIME    1000000  1.148684    0         0.03983   0.000001  0.000001   0.00004    
+SYSTEM-RUN-TIME  1000000  0.786416    0         0.007584  0         0.000001   0.000076   
+PAGE-FAULTS      1000000  0           0         0         0         0          0.0        
+GC-RUN-TIME      1000000  39.632      0         39.632    0         0.00004    0.039632   
+BYTES-CONSED     1000000  1121808432  0         131056    0         1121.8085  5905.457   
+EVAL-CALLS       1000000  0           0         0         0         0          0.0        
+Addition 10x10 + 10x10 (magicl)
+-                SAMPLES  TOTAL       MINIMUM   MAXIMUM   MEDIAN    AVERAGE    DEVIATION  
+REAL-TIME        1000000  1.730589    0         0.104031  0.000002  0.000002   0.000105   
+RUN-TIME         1000000  1.735673    0.000001  0.104159  0.000002  0.000002   0.000105   
+USER-RUN-TIME    1000000  0.99956     0         0.084274  0.000001  0.000001   0.000085   
+SYSTEM-RUN-TIME  1000000  0.808329    0         0.015817  0         0.000001   0.000078   
+PAGE-FAULTS      1000000  0           0         0         0         0          0.0        
+GC-RUN-TIME      1000000  114.821     0         103.955   0         0.000115   0.104521   
+BYTES-CONSED     1000000  1039566192  0         130944    0         1039.5662  5753.0024  
+EVAL-CALLS       1000000  0           0         0         0         0          0.0        
+Addition 1000x1000 + 1000x1000 (em)
+-                SAMPLES  TOTAL       MINIMUM   MAXIMUM   MEDIAN    AVERAGE    DEVIATION  
+REAL-TIME        1000     1.139015    0.000923  0.005267  0.001042  0.001139   0.000337   
+RUN-TIME         1000     4.522638    0.001474  0.021894  0.004161  0.004523   0.001363   
+USER-RUN-TIME    1000     4.473292    0         0.017043  0.004027  0.004473   0.00139    
+SYSTEM-RUN-TIME  1000     0.055661    0         0.007044  0         0.000056   0.00057    
+PAGE-FAULTS      1000     0           0         0         0         0          0.0        
+GC-RUN-TIME      1000     85.394      0         10.198    0         0.085394   0.896447   
+BYTES-CONSED     1000     8000018336  8000016   8001328   8000016   8000018.5  52.578163  
+EVAL-CALLS       1000     0           0         0         0         0          0.0        
+Addition 1000x1000 + 1000x1000 (magicl)
+-                SAMPLES  TOTAL       MINIMUM   MAXIMUM   MEDIAN    AVERAGE    DEVIATION  
+REAL-TIME        1000     1.406371    0.001329  0.004588  0.00137   0.001406   0.000273   
+RUN-TIME         1000     5.528951    0.004912  0.018676  0.005395  0.005529   0.001138   
+USER-RUN-TIME    1000     5.475176    0         0.019035  0.005234  0.005475   0.001301   
+SYSTEM-RUN-TIME  1000     0.054829    0         0.006878  0         0.000055   0.000569   
+PAGE-FAULTS      1000     0           0         0         0         0          0.0        
+GC-RUN-TIME      1000     83.803      0         9.557     0         0.083803   0.879438   
+BYTES-CONSED     1000     8000029072  8000016   8013088   8000016   8000029.0  413.1662   
+EVAL-CALLS       1000     0           0         0         0         0          0.0        
+Determinant 100x100 (em)
+-                SAMPLES  TOTAL      MINIMUM   MAXIMUM   MEDIAN    AVERAGE   DEVIATION  
+REAL-TIME        10000    0.584767   0.000055  0.002806  0.000058  0.000058  0.000028   
+RUN-TIME         10000    1.154807   0.000055  0.002928  0.000058  0.000115  0.000087   
+USER-RUN-TIME    10000    1.155589   0.000053  0.003118  0.000056  0.000116  0.000108   
+SYSTEM-RUN-TIME  10000    0.000008   0         0.000007  0         0.0       0.0        
+PAGE-FAULTS      10000    0          0         0         0         0         0.0        
+GC-RUN-TIME      10000    2.674      0         2.674     0         0.000267  0.026739   
+BYTES-CONSED     10000    811132704  1152      128432    81136     81113.27  1401.2456  
+EVAL-CALLS       10000    0          0         0         0         0         0.0        
+Determinant 100x100 (magicl)
+-                SAMPLES  TOTAL       MINIMUM   MAXIMUM   MEDIAN    AVERAGE    DEVIATION  
+REAL-TIME        10000    0.667748    0.000063  0.00348   0.000066  0.000067   0.000048   
+RUN-TIME         10000    0.669461    0.000064  0.003598  0.000066  0.000067   0.000049   
+USER-RUN-TIME    10000    0.639202    0         0.00376   0.000063  0.000064   0.000058   
+SYSTEM-RUN-TIME  10000    0.008743    0         0.007576  0         0.000001   0.000076   
+PAGE-FAULTS      10000    0           0         0         0         0          0.0        
+GC-RUN-TIME      10000    6.655       0         3.361     0         0.000666   0.047056   
+BYTES-CONSED     10000    1687452672  85424     208560    165440    168745.27  10051.432  
+EVAL-CALLS       10000    0           0         0         0         0          0.0        
+Inversion 100x100 (em)
+-                SAMPLES  TOTAL      MINIMUM   MAXIMUM   MEDIAN    AVERAGE    DEVIATION  
+REAL-TIME        10000    1.498185   0.000133  0.003304  0.000139  0.00015    0.000039   
+RUN-TIME         10000    5.810323   0.000288  0.013286  0.000537  0.000581   0.000161   
+USER-RUN-TIME    10000    5.654373   0         0.014001  0.000507  0.000565   0.000242   
+SYSTEM-RUN-TIME  10000    0.086347   0         0.014566  0         0.000009   0.000271   
+PAGE-FAULTS      10000    0          0         0         0         0          0.0        
+GC-RUN-TIME      10000    12.359     0         12.359    0         0.001236   0.123584   
+BYTES-CONSED     10000    803306992  368       128016    80352     80330.695  1397.4308  
+EVAL-CALLS       10000    0          0         0         0         0          0.0        
+Inversion 100x100 (magicl)
+-                SAMPLES  TOTAL       MINIMUM   MAXIMUM   MEDIAN    AVERAGE   DEVIATION  
+REAL-TIME        10000    13.23457    0.00128   0.004741  0.001322  0.001323  0.000082   
+RUN-TIME         10000    52.950043   0.005119  0.019068  0.005289  0.005295  0.000331   
+USER-RUN-TIME    10000    52.36923    0         0.019546  0.005095  0.005237  0.000724   
+SYSTEM-RUN-TIME  10000    0.590258    0         0.014703  0         0.000059  0.000638   
+PAGE-FAULTS      10000    0           0         0         0         0         0.0        
+GC-RUN-TIME      10000    88.746      0         13.4      0         0.008875  0.315081   
+BYTES-CONSED     10000    6954766496  564992    818432    701264    695476.6  12776.615  
+EVAL-CALLS       10000    0           0         0         0         0         0.0        
+Eigenvalues 10x10 (em)
+-                SAMPLES  TOTAL       MINIMUM   MAXIMUM   MEDIAN    AVERAGE    DEVIATION  
+REAL-TIME        1000000  19.154976   0.000016  0.070598  0.000019  0.000019   0.000085   
+RUN-TIME         1000000  19.538326   0.000017  0.070725  0.000019  0.00002    0.000086   
+USER-RUN-TIME    1000000  17.88677    0         0.054984  0.000018  0.000018   0.000066   
+SYSTEM-RUN-TIME  1000000  1.093261    0         0.015827  0         0.000001   0.00009    
+PAGE-FAULTS      1000000  0           0         0         0         0          0.0        
+GC-RUN-TIME      1000000  156.504     0         70.487    0         0.000157   0.085033   
+BYTES-CONSED     1000000  4223372704  0         130176    0         4223.3726  10906.517  
+EVAL-CALLS       1000000  0           0         0         0         0          0.0        
+Eigenvalues 10x10 (magicl)
+-                SAMPLES  TOTAL        MINIMUM   MAXIMUM   MEDIAN    AVERAGE    DEVIATION  
+REAL-TIME        1000000  22.178726    0.000018  0.056149  0.000022  0.000022   0.000079   
+RUN-TIME         1000000  22.243132    0.000019  0.056294  0.000022  0.000022   0.00008    
+USER-RUN-TIME    1000000  20.553162    0         0.040502  0.000021  0.000021   0.000065   
+SYSTEM-RUN-TIME  1000000  1.133932     0         0.015563  0         0.000001   0.000091   
+PAGE-FAULTS      1000000  0            0         0         0         0          0.0        
+GC-RUN-TIME      1000000  294.695      0         55.998    0         0.000295   0.079126   
+BYTES-CONSED     1000000  18191255360  0         130144    25136     18191.256  15144.802  
+EVAL-CALLS       1000000  0            0         0         0         0          0.0        
+Eigenvalues 1000x1000 (em)
+-                SAMPLES  TOTAL       MINIMUM   MAXIMUM   MEDIAN    AVERAGE     DEVIATION  
+REAL-TIME        50       20.481718   0.393621  0.491396  0.402341  0.409634    0.01629    
+RUN-TIME         50       81.90715    1.571903  1.965556  1.609473  1.638143    0.065491   
+USER-RUN-TIME    50       81.12044    1.545158  1.941472  1.595639  1.622409    0.065294   
+SYSTEM-RUN-TIME  50       0.786925    0         0.046672  0.01549   0.015738    0.010805   
+PAGE-FAULTS      50       0           0         0         0         0           0.0        
+GC-RUN-TIME      50       17.346      0         9.247     0         0.34692     1.703427   
+BYTES-CONSED     50       1601506064  32000048  32032816  32032736  32030122.0  8868.453   
+EVAL-CALLS       50       0           0         0         0         0           0.0        
+Eigenvalues 1000x1000 (magicl)
+-                SAMPLES  TOTAL       MINIMUM   MAXIMUM   MEDIAN    AVERAGE     DEVIATION  
+REAL-TIME        50       20.9341     0.398202  0.598788  0.40499   0.418682    0.032064   
+RUN-TIME         50       83.7353     1.592794  2.394953  1.619946  1.674706    0.128237   
+USER-RUN-TIME    50       83.01159    1.572569  2.355544  1.611584  1.660232    0.123909   
+SYSTEM-RUN-TIME  50       0.724017    0         0.046579  0.008214  0.01448     0.011464   
+PAGE-FAULTS      50       0           0         0         0         0           0.0        
+GC-RUN-TIME      50       33.083      0         8.785     0         0.66166     2.247084   
+BYTES-CONSED     50       3255965360  65079344  65144656  65109168  65119308.0  17114.592  
+EVAL-CALLS       50       0           0         0         0         0           0.0        
+SVD 10x10 (em)
+-                SAMPLES  TOTAL       MINIMUM   MAXIMUM   MEDIAN    AVERAGE    DEVIATION  
+REAL-TIME        1000000  13.896854   0.000012  0.081064  0.000014  0.000014   0.000092   
+RUN-TIME         1000000  14.40887    0.000012  0.081197  0.000014  0.000014   0.000093   
+USER-RUN-TIME    1000000  12.787061   0         0.065361  0.000013  0.000013   0.00008    
+SYSTEM-RUN-TIME  1000000  0.97175     0         0.015616  0         0.000001   0.000084   
+PAGE-FAULTS      1000000  0           0         0         0         0          0.0        
+GC-RUN-TIME      1000000  156.15      0         80.964    0         0.000156   0.092198   
+BYTES-CONSED     1000000  3134050272  0         65008     0         3134.0503  9575.038   
+EVAL-CALLS       1000000  0           0         0         0         0          0.0        
+SVD 10x10 (magicl)
+-                SAMPLES  TOTAL        MINIMUM   MAXIMUM   MEDIAN    AVERAGE   DEVIATION  
+REAL-TIME        1000000  49.213833    0.000045  0.10757   0.000049  0.000049  0.000128   
+RUN-TIME         1000000  49.2674      0.000045  0.107711  0.000049  0.000049  0.000128   
+USER-RUN-TIME    1000000  47.60544     0         0.084181  0.000047  0.000048  0.000105   
+SYSTEM-RUN-TIME  1000000  0.949747     0         0.023466  0         0.000001  0.000085   
+PAGE-FAULTS      1000000  0            0         0         0         0         0.0        
+GC-RUN-TIME      1000000  412.353      0         107.436   0         0.000412  0.127541   
+BYTES-CONSED     1000000  26527641520  0         130768    32736     26527.64  22056.883  
+EVAL-CALLS       1000000  0            0         0         0         0         0.0        
+SVD 1000x1000 (em)
+-                SAMPLES  TOTAL       MINIMUM   MAXIMUM   MEDIAN    AVERAGE     DEVIATION  
+REAL-TIME        50       54.042908   1.011249  1.349936  1.033245  1.080858    0.109316   
+RUN-TIME         50       97.97097    1.888252  2.231014  1.914085  1.959419    0.110442   
+USER-RUN-TIME    50       97.365105   1.873863  2.228781  1.902106  1.947302    0.110066   
+SYSTEM-RUN-TIME  50       0.605897    0         0.03971   0.008206  0.012118    0.008757   
+PAGE-FAULTS      50       0           0         0         0         0           0.0        
+GC-RUN-TIME      50       2.004       0         2.004     0         0.04008     0.28056    
+BYTES-CONSED     50       1200391392  24000048  24026176  24000048  24007828.0  11883.95   
+EVAL-CALLS       50       0           0         0         0         0           0.0        
+SVD 1000x1000 (magicl)
+-                SAMPLES  TOTAL        MINIMUM    MAXIMUM    MEDIAN     AVERAGE      DEVIATION  
+REAL-TIME        50       78.30246     1.385488   1.773686   1.627613   1.566049     0.12425    
+RUN-TIME         50       122.56322    2.263198   2.751026   2.512921   2.451264     0.130852   
+USER-RUN-TIME    50       121.899086   2.239467   2.742798   2.503981   2.437982     0.133341   
+SYSTEM-RUN-TIME  50       0.664177     0          0.063163   0.008359   0.013284     0.013355   
+PAGE-FAULTS      50       0            0          0          0          0            0.0        
+GC-RUN-TIME      50       38.289       0          14.15      0          0.76578      2.117109   
+BYTES-CONSED     50       10026949040  200504544  200597248  200537360  200538980.0  18698.803  
+EVAL-CALLS       50       0            0          0          0          0            0.0        
+row 10x10 (em)
+-                SAMPLES  TOTAL     MINIMUM   MAXIMUM   MEDIAN    AVERAGE   DEVIATION  
+REAL-TIME        1000000  1.591841  0.000001  0.000007  0.000002  0.000002  0.000001   
+RUN-TIME         1000000  1.569195  0.000001  0.000051  0.000002  0.000002  0.000001   
+USER-RUN-TIME    1000000  0.726099  0         0.000265  0         0.000001  0.000002   
+SYSTEM-RUN-TIME  1000000  0.986758  0         0.007619  0         0.000001  0.000085   
+PAGE-FAULTS      1000000  0         0         0         0         0         0.0        
+GC-RUN-TIME      1000000  0         0         0         0         0         0.0        
+BYTES-CONSED     1000000  99850640  0         65456     0         99.85064  1805.845   
+EVAL-CALLS       1000000  0         0         0         0         0         0.0        
+row 10x10 (magicl)
+-                SAMPLES  TOTAL       MINIMUM   MAXIMUM   MEDIAN    AVERAGE    DEVIATION  
+REAL-TIME        1000000  2.850476    0.000001  0.03156   0.000003  0.000003   0.000033   
+RUN-TIME         1000000  2.864322    0.000002  0.031692  0.000003  0.000003   0.000033   
+USER-RUN-TIME    1000000  1.807634    0         0.023812  0.000002  0.000002   0.000025   
+SYSTEM-RUN-TIME  1000000  0.934086    0         0.007788  0         0.000001   0.000083   
+PAGE-FAULTS      1000000  0           0         0         0         0          0.0        
+GC-RUN-TIME      1000000  41.847      0         31.499    0         0.000042   0.033155   
+BYTES-CONSED     1000000  1619609536  0         131072    0         1619.6095  7186.6865  
+EVAL-CALLS       1000000  0           0         0         0         0          0.0        
+row 1000x1000 (em)
+-                SAMPLES  TOTAL     MINIMUM   MAXIMUM   MEDIAN    AVERAGE   DEVIATION  
+REAL-TIME        10000    0.027366  0.000001  0.002686  0.000002  0.000003  0.000027   
+RUN-TIME         10000    0.027566  0.000001  0.002801  0.000002  0.000003  0.000028   
+USER-RUN-TIME    10000    0.014443  0         0.002707  0         0.000001  0.000027   
+SYSTEM-RUN-TIME  10000    0.023343  0         0.007608  0         0.000002  0.000132   
+PAGE-FAULTS      10000    0         0         0         0         0         0.0        
+GC-RUN-TIME      10000    2.628     0         2.628     0         0.000263  0.026279   
+BYTES-CONSED     10000    81098128  0         128016    0         8109.813  14082.685  
+EVAL-CALLS       10000    0         0         0         0         0         0.0        
+row 1000x1000 (magicl)
+-                SAMPLES  TOTAL       MINIMUM   MAXIMUM   MEDIAN    AVERAGE    DEVIATION  
+REAL-TIME        10000    0.496789    0.000046  0.003924  0.000049  0.00005    0.000039   
+RUN-TIME         10000    0.497386    0.000046  0.004008  0.000049  0.00005    0.00004    
+USER-RUN-TIME    10000    0.475098    0         0.00032   0.000048  0.000048   0.000023   
+SYSTEM-RUN-TIME  10000    0.015988    0         0.00774   0         0.000002   0.000109   
+PAGE-FAULTS      10000    0           0         0         0         0          0.0        
+GC-RUN-TIME      10000    3.828       0         3.828     0         0.000383   0.038278   
+BYTES-CONSED     10000    1047046704  65520     226288    98272     104704.67  14248.63   
+EVAL-CALLS       10000    0           0         0         0         0          0.0        
+column 10x10 (em)
+-                SAMPLES  TOTAL      MINIMUM   MAXIMUM   MEDIAN    AVERAGE    DEVIATION  
+REAL-TIME        1000000  1.594295   0.000001  0.000007  0.000002  0.000002   0.000001   
+RUN-TIME         1000000  1.574775   0.000001  0.000028  0.000002  0.000002   0.000001   
+USER-RUN-TIME    1000000  0.707589   0         0.000276  0         0.000001   0.000002   
+SYSTEM-RUN-TIME  1000000  1.033046   0         0.007607  0         0.000001   0.000087   
+PAGE-FAULTS      1000000  0          0         0         0         0          0.0        
+GC-RUN-TIME      1000000  0          0         0         0         0          0.0        
+BYTES-CONSED     1000000  105352736  0         65456     0         105.35274  1854.7618  
+EVAL-CALLS       1000000  0          0         0         0         0          0.0        
+column 10x10 (magicl)
+-                SAMPLES  TOTAL       MINIMUM   MAXIMUM   MEDIAN    AVERAGE    DEVIATION  
+REAL-TIME        1000000  2.976222    0.000002  0.070743  0.000003  0.000003   0.000072   
+RUN-TIME         1000000  2.988624    0.000002  0.070862  0.000003  0.000003   0.000072   
+USER-RUN-TIME    1000000  1.764758    0         0.055114  0.000002  0.000002   0.000057   
+SYSTEM-RUN-TIME  1000000  1.076724    0         0.015592  0         0.000001   0.000089   
+PAGE-FAULTS      1000000  0           0         0         0         0          0.0        
+GC-RUN-TIME      1000000  85.798      0         70.676    0         0.000086   0.072276   
+BYTES-CONSED     1000000  1622084880  0         131072    0         1622.0848  7192.6426  
+EVAL-CALLS       1000000  0           0         0         0         0          0.0        
+column 1000x1000 (em)
+-                SAMPLES  TOTAL     MINIMUM   MAXIMUM   MEDIAN    AVERAGE   DEVIATION  
+REAL-TIME        10000    0.029973  0.000002  0.000009  0.000003  0.000003  0.000001   
+RUN-TIME         10000    0.030251  0.000002  0.000007  0.000003  0.000003  0.000001   
+USER-RUN-TIME    10000    0.020347  0         0.000283  0.000002  0.000002  0.000004   
+SYSTEM-RUN-TIME  10000    0.02321   0         0.007595  0         0.000002  0.000132   
+PAGE-FAULTS      10000    0         0         0         0         0         0.0        
+GC-RUN-TIME      10000    0         0         0         0         0         0.0        
+BYTES-CONSED     10000    81156768  0         128016    0         8115.677  14092.787  
+EVAL-CALLS       10000    0         0         0         0         0         0.0        
+column 1000x1000 (magicl)
+-                SAMPLES  TOTAL       MINIMUM  MAXIMUM   MEDIAN    AVERAGE    DEVIATION  
+REAL-TIME        10000    0.534252    0.00005  0.003678  0.000052  0.000053   0.000047   
+RUN-TIME         10000    0.534937    0.00005  0.003744  0.000052  0.000053   0.000048   
+USER-RUN-TIME    10000    0.512572    0        0.003611  0.00005   0.000051   0.000055   
+SYSTEM-RUN-TIME  10000    0.00864     0        0.007595  0         0.000001   0.000076   
+PAGE-FAULTS      10000    0           0        0         0         0          0.0        
+GC-RUN-TIME      10000    6.584       0        3.564     0         0.000658   0.04671    
+BYTES-CONSED     10000    1047033536  65520    226288    98272     104703.35  14233.059  
+EVAL-CALLS       10000    0           0        0         0         0          0.0        
+reshape-unsafe 10x10 (em)
+-                SAMPLES  TOTAL      MINIMUM   MAXIMUM   MEDIAN    AVERAGE    DEVIATION  
+REAL-TIME        1000000  1.605362   0.000001  0.000011  0.000002  0.000002   0.0        
+RUN-TIME         1000000  1.585234   0.000001  0.000033  0.000002  0.000002   0.000001   
+USER-RUN-TIME    1000000  0.732027   0         0.000289  0         0.000001   0.000003   
+SYSTEM-RUN-TIME  1000000  1.062729   0         0.007595  0         0.000001   0.000089   
+PAGE-FAULTS      1000000  0          0         0         0         0          0.0        
+GC-RUN-TIME      1000000  0          0         0         0         0          0.0        
+BYTES-CONSED     1000000  113624864  0         131056    0         113.62486  1930.5542  
+EVAL-CALLS       1000000  0          0         0         0         0          0.0        
+reshape 10x10 (em)
+-                SAMPLES  TOTAL       MINIMUM   MAXIMUM   MEDIAN    AVERAGE    DEVIATION  
+REAL-TIME        1000000  1.920701    0.000001  0.045143  0.000002  0.000002   0.000055   
+RUN-TIME         1000000  1.911677    0.000001  0.045245  0.000002  0.000002   0.000055   
+USER-RUN-TIME    1000000  0.985267    0         0.034818  0         0.000001   0.000043   
+SYSTEM-RUN-TIME  1000000  0.95954     0         0.0078    0         0.000001   0.000084   
+PAGE-FAULTS      1000000  0           0         0         0         0          0.0        
+GC-RUN-TIME      1000000  76.001      0         45.069    0         0.000076   0.054663   
+BYTES-CONSED     1000000  1841220272  0         130608    0         1841.2202  7503.4233  
+EVAL-CALLS       1000000  0           0         0         0         0          0.0        
+reshape 10x10 (magicl)
+-                SAMPLES  TOTAL      MINIMUM   MAXIMUM   MEDIAN    AVERAGE    DEVIATION  
+REAL-TIME        1000000  2.246151   0.000002  0.000017  0.000002  0.000002   0.0        
+RUN-TIME         1000000  2.250433   0.000002  0.000047  0.000002  0.000002   0.0        
+USER-RUN-TIME    1000000  1.180373   0         0.000302  0.000001  0.000001   0.000004   
+SYSTEM-RUN-TIME  1000000  1.033611   0         0.007583  0         0.000001   0.000087   
+PAGE-FAULTS      1000000  0          0         0         0         0          0.0        
+GC-RUN-TIME      1000000  0          0         0         0         0          0.0        
+BYTES-CONSED     1000000  262692256  0         131040    0         262.69226  2926.6733  
+EVAL-CALLS       1000000  0          0         0         0         0          0.0        
+reshape-unsafe 1000x1000 (em)
+-                SAMPLES  TOTAL     MINIMUM   MAXIMUM   MEDIAN    AVERAGE   DEVIATION  
+REAL-TIME        10000    0.012471  0.000001  0.000009  0.000001  0.000001  0.0        
+RUN-TIME         10000    0.01239   0.000001  0.000007  0.000001  0.000001  0.0        
+USER-RUN-TIME    10000    0.00552   0         0.000299  0         0.000001  0.000003   
+SYSTEM-RUN-TIME  10000    0.007844  0         0.007576  0         0.000001  0.000076   
+PAGE-FAULTS      10000    0         0         0         0         0         0.0        
+GC-RUN-TIME      10000    0         0         0         0         0         0.0        
+BYTES-CONSED     10000    916896    0         131024    0         91.6896   2069.211   
+EVAL-CALLS       10000    0         0         0         0         0         0.0        
+reshape 1000x1000 (em)
+-                SAMPLES  TOTAL         MINIMUM   MAXIMUM   MEDIAN    AVERAGE     DEVIATION  
+REAL-TIME        10000    20.943714     0.001732  0.022788  0.00196   0.002094    0.000677   
+RUN-TIME         10000    20.960726     0.001732  0.022838  0.001961  0.002096    0.000682   
+USER-RUN-TIME    10000    19.712542     0         0.009362  0.001902  0.001971    0.000565   
+SYSTEM-RUN-TIME  10000    1.251075      0         0.023395  0         0.000125    0.001016   
+PAGE-FAULTS      10000    0             0         0         0         0           0.0        
+GC-RUN-TIME      10000    449.814       0         19.603    0         0.044981    0.498504   
+BYTES-CONSED     10000    160000483728  16000032  16131040  16000032  16000048.0  1350.2228  
+EVAL-CALLS       10000    0             0         0         0         0           0.0        
+reshape 1000x1000 (magicl)
+-                SAMPLES  TOTAL     MINIMUM   MAXIMUM   MEDIAN    AVERAGE   DEVIATION  
+REAL-TIME        10000    0.018099  0.000001  0.000022  0.000002  0.000002  0.000001   
+RUN-TIME         10000    0.018161  0.000001  0.000019  0.000002  0.000002  0.0        
+USER-RUN-TIME    10000    0.004774  0         0.000302  0         0.0       0.000003   
+SYSTEM-RUN-TIME  10000    0.008106  0         0.007574  0         0.000001  0.000076   
+PAGE-FAULTS      10000    0         0         0         0         0         0.0        
+GC-RUN-TIME      10000    0         0         0         0         0         0.0        
+BYTES-CONSED     10000    2816368   0         131040    0         281.6368  3262.892   
+EVAL-CALLS       10000    0         0         0         0         0         0.0        
+hstack 10x10 (em)
+-                SAMPLES  TOTAL     MINIMUM   MAXIMUM   MEDIAN    AVERAGE   DEVIATION  
+REAL-TIME        1000000  1.158557  0         0.000006  0.000001  0.000001  0.0        
+RUN-TIME         1000000  1.142853  0.000001  0.000034  0.000001  0.000001  0.0        
+USER-RUN-TIME    1000000  0.624123  0         0.000307  0.000001  0.000001  0.000003   
+SYSTEM-RUN-TIME  1000000  0.534155  0         0.007575  0         0.000001  0.000062   
+PAGE-FAULTS      1000000  0         0         0         0         0         0.0        
+GC-RUN-TIME      1000000  0         0         0         0         0         0.0        
+BYTES-CONSED     1000000  32480     0         32480     0         0.03248   32.479984  
+EVAL-CALLS       1000000  0         0         0         0         0         0.0        
+hstack 10x10 (magicl)
+-                SAMPLES  TOTAL        MINIMUM   MAXIMUM   MEDIAN    AVERAGE   DEVIATION  
+REAL-TIME        1000000  20.990986    0.000017  0.088711  0.00002   0.000021  0.000104   
+RUN-TIME         1000000  21.028032    0.000017  0.088816  0.00002   0.000021  0.000105   
+USER-RUN-TIME    1000000  19.707611    0         0.072984  0.000019  0.00002   0.00009    
+SYSTEM-RUN-TIME  1000000  0.802205     0         0.015557  0         0.000001  0.000076   
+PAGE-FAULTS      1000000  0            0         0         0         0         0.0        
+GC-RUN-TIME      1000000  441.113      0         88.622    0         0.000441  0.104226   
+BYTES-CONSED     1000000  43023108960  0         131072    32752     43023.11  17702.957  
+EVAL-CALLS       1000000  0            0         0         0         0         0.0        
+hstack 1000x1000 (em)
+-                SAMPLES  TOTAL     MINIMUM   MAXIMUM   MEDIAN    AVERAGE   DEVIATION  
+REAL-TIME        1000     0.001153  0.000001  0.000008  0.000001  0.000001  0.0        
+RUN-TIME         1000     0.001151  0.000001  0.000005  0.000001  0.000001  0.0        
+USER-RUN-TIME    1000     0.000072  0         0.000003  0         0.0       0.0        
+SYSTEM-RUN-TIME  1000     0.000041  0         0.000001  0         0.0       0.0        
+PAGE-FAULTS      1000     0         0         0         0         0         0.0        
+GC-RUN-TIME      1000     0         0         0         0         0         0.0        
+BYTES-CONSED     1000     0         0         0         0         0         0.0        
+EVAL-CALLS       1000     0         0         0         0         0         0.0        
+hstack 1000x1000 (magicl)
+-                SAMPLES  TOTAL         MINIMUM    MAXIMUM    MEDIAN     AVERAGE      DEVIATION  
+REAL-TIME        1000     173.55977     0.161545   0.269179   0.169504   0.17356      0.013016   
+RUN-TIME         1000     173.60103     0.161544   0.269237   0.16957    0.173601     0.013023   
+USER-RUN-TIME    1000     169.1527      0.127958   0.208131   0.168797   0.169153     0.005667   
+SYSTEM-RUN-TIME  1000     4.44907       0          0.094548   0          0.004449     0.013191   
+PAGE-FAULTS      1000     0             0          0          0          0            0.0        
+GC-RUN-TIME      1000     1485.311      0          48.052     0          1.485311     3.41822    
+BYTES-CONSED     1000     407987877952  407932960  408031344  407998576  407987870.0  25853.355  
+EVAL-CALLS       1000     0             0          0          0          0            0.0        
+vstack 10x10 (em)
+-                SAMPLES  TOTAL     MINIMUM   MAXIMUM   MEDIAN    AVERAGE   DEVIATION  
+REAL-TIME        1000000  1.537341  0.000001  0.000007  0.000002  0.000002  0.0        
+RUN-TIME         1000000  1.513013  0.000001  0.00006   0.000002  0.000002  0.000001   
+USER-RUN-TIME    1000000  0.594744  0         0.000305  0         0.000001  0.000003   
+SYSTEM-RUN-TIME  1000000  1.102429  0         0.007578  0         0.000001  0.00009    
+PAGE-FAULTS      1000000  0         0         0         0         0         0.0        
+GC-RUN-TIME      1000000  0         0         0         0         0         0.0        
+BYTES-CONSED     1000000  0         0         0         0         0         0.0        
+EVAL-CALLS       1000000  0         0         0         0         0         0.0        
+vstack 10x10 (magicl)
+-                SAMPLES  TOTAL        MINIMUM   MAXIMUM   MEDIAN   AVERAGE    DEVIATION  
+REAL-TIME        1000000  21.23639     0.000017  0.046141  0.00002  0.000021   0.000077   
+RUN-TIME         1000000  21.283892    0.000017  0.046215  0.00002  0.000021   0.000077   
+USER-RUN-TIME    1000000  19.233622    0         0.038381  0.00002  0.000019   0.000068   
+SYSTEM-RUN-TIME  1000000  1.22364      0         0.015992  0        0.000001   0.000094   
+PAGE-FAULTS      1000000  0            0         0         0        0          0.0        
+GC-RUN-TIME      1000000  413.051      0         46.066    0        0.000413   0.076577   
+BYTES-CONSED     1000000  43022978032  0         163808    32752    43022.977  17702.148  
+EVAL-CALLS       1000000  0            0         0         0        0          0.0        
+vstack 1000x1000 (em)
+-                SAMPLES  TOTAL     MINIMUM   MAXIMUM   MEDIAN    AVERAGE   DEVIATION  
+REAL-TIME        1000     0.001126  0.000001  0.000008  0.000001  0.000001  0.0        
+RUN-TIME         1000     0.001104  0.000001  0.000004  0.000001  0.000001  0.0        
+USER-RUN-TIME    1000     0.001074  0         0.000004  0.000001  0.000001  0.0        
+SYSTEM-RUN-TIME  1000     0.000046  0         0.000001  0         0.0       0.0        
+PAGE-FAULTS      1000     0         0         0         0         0         0.0        
+GC-RUN-TIME      1000     0         0         0         0         0         0.0        
+BYTES-CONSED     1000     0         0         0         0         0         0.0        
+EVAL-CALLS       1000     0         0         0         0         0         0.0        
+vstack 1000x1000 (magicl)
+-                SAMPLES  TOTAL         MINIMUM    MAXIMUM    MEDIAN     AVERAGE      DEVIATION  
+REAL-TIME        1000     171.09563     0.154858   0.241557   0.168771   0.171096     0.013184   
+RUN-TIME         1000     170.91425     0.154857   0.241646   0.168662   0.170914     0.013059   
+USER-RUN-TIME    1000     166.59082     0.125097   0.198244   0.16682    0.166591     0.006256   
+SYSTEM-RUN-TIME  1000     4.316694      0          0.109714   0          0.004317     0.013202   
+PAGE-FAULTS      1000     0             0          0          0          0            0.0        
+GC-RUN-TIME      1000     1382.646      0          42.965     0          1.382646     3.037232   
+BYTES-CONSED     1000     407987932960  407932960  408031344  407998576  407987940.0  25876.34   
+EVAL-CALLS       1000     0             0          0          0          0            0.0        
