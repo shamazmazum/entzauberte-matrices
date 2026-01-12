@@ -26,5 +26,5 @@ displaced arrays."
          :specialized-element-type (sb-kernel:array-type-specialized-element-type type)
          :complexp nil)))))
 
-(sb-c:deftransform array-storage-vector ((array) ((simple-array * (*))))
-  'array)
+(sb-c:deftransform array-storage-vector ((array) (simple-array))
+  '(sb-ext:array-storage-vector array))
