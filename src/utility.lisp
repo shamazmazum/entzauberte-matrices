@@ -49,7 +49,7 @@
       (let ((type (sb-c::lvar-value type)))
         (sb-kernel:specifier-type `(simple-array ,type (* *)))))))
 
-(sb-c:defknown (hstack vstack) (list t) (smat *)
+(sb-c:defknown (hstack vstack) (list sb-kernel:type-specifier) (smat *)
     (sb-c:foldable sb-c:unsafely-flushable)
   :overwrite-fndb-silently t
   :derive-type #'stack-type-deriver)
