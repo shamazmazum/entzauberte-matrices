@@ -33,7 +33,7 @@ function if possible)."
              `(progn
                 (serapeum:-> ,name ((mat ,lisp-type)
                                     (mat ,lisp-type))
-                             (values (smat ,lisp-type) &optional))
+                             (values (or (smat ,lisp-type) null) integer &optional))
                 (defun ,name (a b)
                   (let ((acopy (transpose a))
                         (bcopy (transpose b))
@@ -46,8 +46,9 @@ function if possible)."
                                            (ldbptr  :int)
                                            (infoptr :int))
                       (flet ((check-info ()
-                               (unless (zerop (mem-ref infoptr :int))
-                                 (error 'lapack-error :message "Cannot solve an equation"))))
+                               (let ((info (mem-ref infoptr :int)))
+                                 (unless (zerop info)
+                                   (return-from ,name (values nil info))))))
                         (setf (mem-ref nptr    :int) n
                               (mem-ref nrhsptr :int) nrhs
                               (mem-ref ldaptr  :int) n
@@ -57,18 +58,19 @@ function if possible)."
                           (,low-level-fn
                            nptr nrhsptr aptr ldaptr ipivptr bptr ldbptr infoptr)
                           (check-info))))
-                    (transpose bcopy))))))
+                    (values (transpose bcopy) 0))))))
   (def-solve solve-rs-unsafe %sgesv single-float)
   (def-solve solve-rd-unsafe %dgesv double-float)
   (def-solve solve-cs-unsafe %cgesv (complex single-float))
   (def-solve solve-cd-unsafe %zgesv (complex double-float)))
 
 (serapeum:-> solve ((mat *) (mat *))
-             (values (smat *) &optional))
+             (values (or (smat *) null) integer &optional))
 (declaim (inline solve))
 (defun solve (a b)
   "Solve an equation \\(AX = B\\). This function uses @c(transpose)
-internally."
+internally. Return @c((values X infocode)) where @c(X) may be @c(null)
+if the solver fails."
   (assert (= (array-dimension a 0)
              (array-dimension a 1)
              (array-dimension b 0)))

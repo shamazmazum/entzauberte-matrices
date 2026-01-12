@@ -288,7 +288,8 @@
                   (loop repeat 400
                         for n = (+ (random 100) 2)
                         for a = (random-self-adjoint n ',type) do
-                          (flet ((check (Λ %t)
+                          (flet ((check (Λ %t info)
+                                   (declare (ignore info))
                                    (is-true (array-approx-p
                                              (em:mult %t a)
                                              (multiply-eig %t Λ)))))
@@ -346,7 +347,8 @@
                         for n   = (+ (random 100) 2)
                         for min = (min m n)
                         for a   = (random-matrix m n ',type) do
-                          (flet ((%test (compactp u s vt)
+                          (flet ((%test (compactp u s vt info)
+                                   (declare (ignore info))
                                    (let ((s (if compactp
                                                 (from-diag s min min)
                                                 (from-diag s m n))))

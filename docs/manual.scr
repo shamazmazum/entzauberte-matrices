@@ -36,6 +36,5 @@
        @cl:doc(function hstack)
        @cl:doc(function vstack)
        @cl:doc(function set-num-threads)
-       @cl:doc(condition lapack-error)
      )
 @end(section)

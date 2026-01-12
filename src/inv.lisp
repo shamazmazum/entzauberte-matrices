@@ -20,7 +20,7 @@
              (let ((complexp (listp lisp-type)))
                `(progn
                   (serapeum:-> ,name ((mat ,lisp-type))
-                               (values (smat ,lisp-type) &optional))
+                               (values (or (smat ,lisp-type) null) integer &optional))
                   (defun ,name (a)
                     (let* ((n (array-dimension a 0))
                            (lda n)
@@ -33,8 +33,7 @@
                         (flet ((check-info (infoptr)
                                  (let ((info (mem-ref infoptr :int)))
                                    (when (< info 0)
-                                     (error 'lapack-error
-                                            :message "Cannot invert a matrix")))))
+                                     (return-from ,name (values nil info))))))
                           (setf (mem-ref mptr   :int) n
                                 (mem-ref nptr   :int) n
                                 (mem-ref ldaptr :int) lda)
@@ -58,17 +57,19 @@
                                 (setf (mem-ref lworkptr :int) work)
                                 (,invfn nptr aptr ldaptr ipivptr workptr lworkptr infoptr)
                                 (check-info infoptr))))))
-                      acopy))))))
+                      (values acopy 0)))))))
   (def-inv-lisp inv-rs-unsafe single-float :float  %sgetrf %sgetri)
   (def-inv-lisp inv-rd-unsafe double-float :double %dgetrf %dgetri)
   (def-inv-lisp inv-cs-unsafe (complex single-float) :float  %cgetrf %cgetri)
   (def-inv-lisp inv-cd-unsafe (complex double-float) :double %zgetrf %zgetri))
 
 (serapeum:-> invert ((mat *))
-             (values (smat *) &optional))
+             (values (or (smat *) null) integer &optional))
 (declaim (inline invert))
 (defun invert (m)
-  "Compute \\(M^{-1}\\) using \\(LU\\) factorization."
+  "Compute \\(M^{-1}\\) using \\(LU\\) factorization. Returns
+@c((values inv infocode)) where @c(inv) can be @c(null) if \\(LU\\)
+factoirization or inversion routine fails."
   (unless (= (array-dimension m 0)
              (array-dimension m 1))
     (error "Cannot invert a matrix: non-square matrix"))

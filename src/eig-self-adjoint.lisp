@@ -26,8 +26,9 @@
 (macrolet ((def-self-adjoint-lisp (name low-level-fn lisp-type foreign-type)
              `(progn
                 (serapeum:-> ,name ((mat ,lisp-type) uplo)
-                             (values (svec ,lisp-type)
-                                     (smat ,lisp-type)
+                             (values (or (svec ,lisp-type) null)
+                                     (or (smat ,lisp-type) null)
+                                     integer
                                      &optional))
                 (defun ,name (a where)
                   (let* ((n (array-dimension a 0))
@@ -44,9 +45,7 @@
                         (flet ((check-info ()
                                  (let ((info (mem-ref infoptr :int)))
                                    (unless (zerop info)
-                                     (error 'lapack-error
-                                            :message "Cannot compute eigenvalues"
-                                            :info info)))))
+                                     (return-from ,name (values nil nil info))))))
                           (setf (mem-ref jobzptr :char)
                                 (char-code #\V)
                                 (mem-ref uploptr :char)
@@ -68,7 +67,7 @@
                               (,low-level-fn jobzptr uploptr nptr aptr ldaptr wptr
                                              workptr lworkptr infoptr)
                               (check-info))))))
-                    (values vals copy))))))
+                    (values vals copy 0))))))
   (def-self-adjoint-lisp eig-self-adjoint-rs-unsafe %ssyev single-float :float)
   (def-self-adjoint-lisp eig-self-adjoint-rd-unsafe %dsyev double-float :double))
 
@@ -77,8 +76,9 @@
              (let ((real-type (second lisp-type)))
                `(progn
                   (serapeum:-> ,name ((mat ,lisp-type) uplo)
-                               (values (svec ,real-type)
-                                       (smat ,lisp-type)
+                               (values (or (svec ,real-type) null)
+                                       (or (smat ,lisp-type) null)
+                                       integer
                                        &optional))
                   (defun ,name (a where)
                     (let* ((n (array-dimension a 0))
@@ -97,9 +97,7 @@
                           (flet ((check-info ()
                                    (let ((info (mem-ref infoptr :int)))
                                      (unless (zerop info)
-                                       (error 'lapack-error
-                                              :message "Cannot compute eigenvalues"
-                                              :info info)))))
+                                       (return-from ,name (values nil nil info))))))
                             (setf (mem-ref jobzptr :char)
                                   (char-code #\V)
                                   (mem-ref uploptr :char)
@@ -122,16 +120,17 @@
                                                workptr lworkptr rworkptr infoptr)
                                 (check-info))))))
                       ;; Conjugate back
-                      (values vals (map-array #'conjugate copy))))))))
+                      (values vals (map-array #'conjugate copy) 0)))))))
   (def-self-adjoint-lisp eig-self-adjoint-cs-unsafe %cheev (complex single-float) :float)
   (def-self-adjoint-lisp eig-self-adjoint-cd-unsafe %zheev (complex double-float) :double))
 
 (serapeum:-> eig-self-adjoint ((mat *) uplo)
-             (values (svec *) (smat *) &optional))
+             (values (or (svec *) null)
+                     (or (smat *) null)
+                     integer &optional))
 (declaim (inline eig-self-adjoint))
 (defun eig-self-adjoint (m where)
-  "Compute eigenvalues (the first returned value) and eigenvectors
-(the second returned value) of a self-adjoint matrix
+    "Compute eigenvalues and eigenvectors of a self-adjoin matrix
 \\(M\\). Eigenvectors are stored @b(in rows), so that (in pseudo-code)
 
 @begin[lang=lisp](code)
@@ -141,7 +140,9 @@
            (mult (from-diag vals) vecs)))
 @end(code)
 
-is @c(T)."
+is @c(T). The returned values @c(vals) and @c(vecs) may be @c(null) if
+the decomposition fails. The third returned value is the info code
+returned by LAPACK."
   (assert (= (array-dimension m 0)
              (array-dimension m 1)))
   (funcall

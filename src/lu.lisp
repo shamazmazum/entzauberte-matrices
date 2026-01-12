@@ -20,8 +20,8 @@
 (macrolet ((def-lisp-lu (name low-level-fn type)
              `(progn
                 (serapeum:-> ,name ((mat ,type))
-                             (values (smat ,type)
-                                     (svec (unsigned-byte 32))
+                             (values (or (smat ,type) null)
+                                     (or (svec (unsigned-byte 32)) null)
                                      integer &optional))
                 (defun ,name (a)
                   (let* (; Number of rows, but our matrix is row-major
@@ -41,16 +41,18 @@
                                             (ipivptr ipiv))
                         (,low-level-fn mptr nptr aptr ldaptr ipivptr infoptr))
                       (let ((info (mem-ref infoptr :int)))
-                        (when (< info 0)
-                          (error 'lapack-error :message "Cannot perform LU decomposition"))
-                        (values acopy (fix-pivot ipiv) info))))))))
+                        (if (zerop info)
+                            (values acopy (fix-pivot ipiv) 0)
+                            (values nil nil info)))))))))
   (def-lisp-lu %lu-rs %sgetrf single-float)
   (def-lisp-lu %lu-rd %dgetrf double-float)
   (def-lisp-lu %lu-cs %cgetrf (complex single-float))
   (def-lisp-lu %lu-cd %zgetrf (complex double-float)))
 
 (serapeum:-> %lu ((mat *))
-             (values (smat *) (svec (unsigned-byte 32)) integer &optional))
+             (values (or (smat *) null)
+                     (or (svec (unsigned-byte 32)) null)
+                     integer &optional))
 (declaim (inline %lu))
 (defun %lu (a)
   (cond

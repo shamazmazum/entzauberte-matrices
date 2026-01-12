@@ -18,27 +18,34 @@
 (macrolet ((def-det (name type)
              `(progn
                 (serapeum:-> ,name ((mat ,type))
-                             (values ,type &optional))
+                             (values (or ,type null) integer &optional))
                 (defun ,name (m)
-                  (multiple-value-bind (lu ipiv)
+                  (multiple-value-bind (lu ipiv info)
                       (%lu m)
-                    (* (expt -1 (inversions ipiv))
-                       (let ((det (coerce 1 ',type)))
-                         ;; SBCL cannot infer the type of DET, hence all this macrolet shit
-                         (declare (type ,type det))
-                         (loop for i below (array-dimension m 0) do
-                           (setq det (* det (aref lu i i))))
-                         det)))))))
+                    (if (zerop info)
+                        (values
+                         (* (expt -1 (inversions ipiv))
+                            (let ((det (coerce 1 ',type)))
+                              ;; SBCL cannot infer the type of DET,
+                              ;; hence all this macrolet shit
+                              (declare (type ,type det))
+                              (loop for i below (array-dimension m 0) do
+                                (setq det (* det (aref lu i i))))
+                              det))
+                         0)
+                        (values nil info)))))))
   (def-det det-rs-unsafe single-float)
   (def-det det-rd-unsafe double-float)
   (def-det det-cs-unsafe (complex single-float))
   (def-det det-cd-unsafe (complex double-float)))
 
 (serapeum:-> det ((mat *))
-             (values number &optional))
+             (values (or number null) integer &optional))
 (declaim (inline det))
 (defun det (m)
-  "Compute \\(\\det (M)\\) using \\(LU\\) factorization."
+  "Compute \\(\\det (M)\\) using \\(LU\\) factorization. Returns
+@c((values det infocode)) where @c(det) can be @c(null) if \\(LU\\)
+factorization fails."
   (unless (= (array-dimension m 0)
              (array-dimension m 1))
     (error "The matrix is not square"))

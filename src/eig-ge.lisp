@@ -30,8 +30,9 @@
 (macrolet ((def-eig (name low-level-fn lisp-type foreign-type)
              `(progn
                 (serapeum:-> ,name ((mat ,lisp-type))
-                             (values (svec ,lisp-type)
-                                     (smat ,lisp-type)
+                             (values (or (svec ,lisp-type) null)
+                                     (or (smat ,lisp-type) null)
+                                     integer
                                      &optional))
                 (defun ,name (a)
                   (let* ((n (array-dimension a 0))
@@ -48,9 +49,9 @@
                                            (rworkptr ,foreign-type (* n 2))
                                            (infoptr  :int))
                       (flet ((check-info ()
-                               (unless (zerop (mem-ref infoptr :int))
-                                 (error 'lapack-error
-                                        :message "Cannot compute eigenvalues"))))
+                               (let ((info (mem-ref infoptr :int)))
+                                 (unless (zerop info)
+                                   (return-from ,name (values nil nil info))))))
                         (setf (mem-ref jobvlptr :char)
                               ;; To be consistent with EIG-SELF-ADJOINT
                               (char-code #\N)
@@ -82,7 +83,7 @@
                                                    ldvrptr workptr lworkptr rworkptr
                                                    infoptr)
                               (check-info))))))
-                    (values vals vecs))))))
+                    (values vals vecs 0))))))
   (def-eig eig-cs-unsafe %cgeev (complex single-float) :float)
   (def-eig eig-cd-unsafe %zgeev (complex double-float) :double))
 
@@ -90,8 +91,9 @@
 (macrolet ((def-eig (name low-level-fn lisp-type foreign-type)
              `(progn
                 (serapeum:-> ,name ((mat ,lisp-type))
-                             (values (svec (complex ,lisp-type))
-                                     (smat (complex ,lisp-type))
+                             (values (or (svec (complex ,lisp-type)) null)
+                                     (or (smat (complex ,lisp-type)) null)
+                                     integer
                                      &optional))
                 (defun ,name (a)
                   (let* ((n (array-dimension a 0))
@@ -110,9 +112,9 @@
                                            (ldvrptr  :int)
                                            (infoptr  :int))
                       (flet ((check-info ()
-                               (unless (zerop (mem-ref infoptr :int))
-                                 (error 'lapack-error
-                                        :message "Cannot compute eigenvalues"))))
+                               (let ((info (mem-ref infoptr :int)))
+                               (unless (zerop info)
+                                 (return-from ,name (values nil nil info))))))
                         (setf (mem-ref jobvlptr :char)
                               ;; To be consistent with EIG-SELF-ADJOINT
                               (char-code #\N)
@@ -166,17 +168,18 @@
                            (setf (aref vecs i j)
                                  (complex (+ (aref vecs-re (1- i) j))
                                           (- (aref vecs-re ( + i) j))))))))
-                    (values vals vecs))))))
+                    (values vals vecs 0))))))
   (def-eig eig-rs-unsafe %sgeev single-float :float)
   (def-eig eig-rd-unsafe %dgeev double-float :double))
 
 (serapeum:-> eig ((mat *))
-             (values (svec *) (smat *) &optional))
+             (values (or (svec *) null)
+                     (or (smat *) null)
+                     integer &optional))
 (declaim (inline eig))
 (defun eig (m)
-  "Compute eigenvalues (the first returned value) and eigenvectors
-(the second returned value) of \\(M\\). Eigenvectors are stored
-@b(in rows), so that (in pseudo-code)
+  "Compute eigenvalues and eigenvectors of \\(M\\). Eigenvectors are
+stored @b(in rows), so that (in pseudo-code)
 
 @begin[lang=lisp](code)
 (multiple-value-bind (vals vecs)
@@ -185,7 +188,9 @@
            (mult (to-complex (from-diag vals)) vecs)))
 @end(code)
 
-is @c(T)."
+is @c(T). The returned values @c(vals) and @c(vecs) may be @c(null) if
+the decomposition fails. The third returned value is the info code
+returned by LAPACK."
   (assert (= (array-dimension m 0)
              (array-dimension m 1)))
   (cond

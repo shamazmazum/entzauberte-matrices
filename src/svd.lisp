@@ -29,9 +29,10 @@
                     (real-type (if complexp (second lisp-type) lisp-type)))
                `(progn
                   (serapeum:-> ,name ((mat ,lisp-type) boolean)
-                               (values (smat ,lisp-type)
-                                       (svec ,real-type)
-                                       (smat ,lisp-type)
+                               (values (or (smat ,lisp-type) null)
+                                       (or (svec ,real-type) null)
+                                       (or (smat ,lisp-type) null)
+                                       integer
                                        &optional))
                   (defun ,name (a compact)
                     (let* ((m (array-dimension a 1)) ; Number of rows in A^T
@@ -55,9 +56,9 @@
                                                                (* min 5))))
                                              (infoptr  :int))
                         (flet ((check-info ()
-                                 (unless (zerop (mem-ref infoptr :int))
-                                   (error 'lapack-error
-                                          :message "Cannot compute SVD decomposition"))))
+                                 (let ((info (mem-ref infoptr :int)))
+                                   (unless (zerop info)
+                                     (return-from ,name (values nil nil nil info))))))
                           (with-array-pointers ((aptr  acopy)
                                                 (sptr  s)
                                                 (uptr  u)
@@ -92,14 +93,17 @@
                                                lworkptr ,@(if complexp '(rworkptr))
                                                infoptr)
                                 (check-info))))))
-                      (values vt s u)))))))
+                      (values vt s u 0)))))))
   (def-svd svd-rs %sgesvd single-float :float)
   (def-svd svd-rd %dgesvd double-float :double)
   (def-svd svd-cs %cgesvd (complex single-float) :float)
   (def-svd svd-cd %zgesvd (complex double-float) :double))
 
 (serapeum:-> svd ((mat *) &key (:compact boolean))
-             (values (smat *) (svec *) (smat *) &optional))
+             (values (or (smat *) null)
+                     (or (svec *) null)
+                     (or (smat *) null)
+                     integer &optional))
 (declaim (inline svd))
 (defun svd (m &key compact)
   "Do the singular value decomposition of a matrix \\(M = U\\Sigma
@@ -128,7 +132,9 @@ that in pseudocode
     (approx= (mult U (mult (from-diag Σ r r) VT)) m)))
 @end(code)
 
-is @c(T)."
+is @c(T). The first three returned values may be @c(null) if the
+decomposition fails. The fourth value is the info code returned by
+LAPACK."
   (funcall
    (cond
      ((eq (array-element-type m) 'single-float)
