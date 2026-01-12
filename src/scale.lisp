@@ -42,6 +42,7 @@
 
 (serapeum:-> scale ((mat-or-vec *) number)
              (values (smat-or-svec *) &optional))
+(declaim (inline scale))
 (defun scale (m s)
   "Compute \\(s m\\) where \\(s\\) is a scalar and \\(m\\) is a matrix
 or a vector."

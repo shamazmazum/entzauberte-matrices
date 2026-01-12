@@ -403,8 +403,8 @@
         for v2 = (random-vector n 'single-float) do
           (is (approxp (em:dot v1 v2)
                        (aref
-                        (em:mult (em:reshape-unsafe v1 (list 1 n))
-                                 (em:reshape-unsafe v2 (list n 1)))
+                        (em:mult (em:vector->row-unsafe    v1)
+                                 (em:vector->column-unsafe v2))
                         0 0)))))
 
 (test stack
