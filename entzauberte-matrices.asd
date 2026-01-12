@@ -27,7 +27,6 @@
                       (uiop:symbol-call :entzauberte-matrices/tests '#:run-tests)))
 
 (defsystem :entzauberte-matrices/tests
-    :version "0.1"
     :author "Vasily Postnicov <shamaz.mazum@gmail.com>"
     :license "2-clause BSD"
     :pathname "tests"
@@ -37,3 +36,13 @@
                  :alexandria
                  :fiveam
                  :approx))
+
+(defsystem :entzauberte-matrices/benchmarks
+    :author "Vasily Postnicov <shamaz.mazum@gmail.com>"
+    :license "2-clause BSD"
+    :pathname "benchmarks"
+    :components ((:file "package")
+                 (:file "benchmarks" :depends-on ("package")))
+    :depends-on (:entzauberte-matrices
+                 :magicl
+                 :trivial-benchmark))
