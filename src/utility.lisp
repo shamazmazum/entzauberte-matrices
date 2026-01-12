@@ -1,8 +1,52 @@
 (in-package :entzauberte-matrices)
 
-(declaim (inline reshape))
+(serapeum:-> vector->column ((vec *))
+             (values (simple-array * (* 1)) &optional))
+(declaim (inline vector->column))
+(defun vector->column (m)
+  "Turn a vector to a \\(n \\times 1\\) matrix."
+  (let ((result (make-array (list (length m) 1)
+                            :element-type (array-element-type m))))
+    (replace (array-storage-vector result)
+             (array-storage-vector m))
+    result))
+
+(serapeum:-> vector->column-unsafe ((vec *))
+             (values (array * (* 1)) &optional))
+(declaim (inline vector->column-unsafe))
+(defun vector->column-unsafe (m)
+  "Turn a vector to a \\(n \\times 1\\) matrix. The result will share
+the storage with @c(m)."
+  (make-array (list (length m) 1)
+              :element-type (array-element-type m)
+              :displaced-to m))
+
+(serapeum:-> vector->row ((vec *))
+             (values (simple-array * (1 *)) &optional))
+(declaim (inline vector->row))
+(defun vector->row (m)
+  "Turn a vector to a \\(1 \\times n\\) matrix."
+  (let ((result (make-array (list 1 (length m))
+                            :element-type (array-element-type m))))
+    (replace (array-storage-vector result)
+             (array-storage-vector m))
+    result))
+
+(serapeum:-> vector->row-unsafe ((vec *))
+             (values (array * (1 *)) &optional))
+(declaim (inline vector->row-unsafe))
+(defun vector->row-unsafe (m)
+  "Turn a vector to a \\(1 \\times n\\) matrix. The result will share
+the storage with @c(m)."
+  (make-array (list 1 (length m))
+              :element-type (array-element-type m)
+              :displaced-to m))
+
+(declaim (inline reshape)
+         (sb-ext:deprecated :early "0.2" (function reshape)))
 (defun reshape (m shape)
-  "Reshape an array."
+  "Reshape an array. @b(Deprecated): use @c(column), @c(row),
+@c(vector->column) or @c(vector->row)."
   (locally
       ;; Decrease the amount of noise
       (declare (optimize (speed 0)))
@@ -13,9 +57,12 @@
              (array-storage-vector m))
     result))
 
-(declaim (inline reshape-unsafe))
+(declaim (inline reshape-unsafe)
+         (sb-ext:deprecated :early "0.2" (function reshape-unsafe)))
 (defun reshape-unsafe (m shape)
-  "Reshape an array. The new array will share the storage with the argument."
+  "Reshape an array. The new array will share the storage with the
+argument. @b(Deprecated): use @c(column), @c(row),
+@c(vector->column-unsafe) or @c(vector->row-unsafe)."
   (locally
       ;; Decrease the amount of noise
       (declare (optimize (speed 0)))
