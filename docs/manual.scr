@@ -6,7 +6,7 @@
 
    In contrast to MAGICL, entzauberte-matrices operates on usual Common Lisp
    arrays with real or complex floating points elements, more precisely on
-   arrays of type @c((simple-array TYPE 2)) where @c(TYPE) is one of
+   arrays of type @c((array TYPE 2)) where @c(TYPE) is one of
    @c(single-float)/@c(double-float)/@c((complex single-float))/@c((complex
    double-float)). For binary operations, both arguments must have the same
    type.
