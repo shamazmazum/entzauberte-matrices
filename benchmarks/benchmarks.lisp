@@ -121,9 +121,11 @@
 
 (defun vstack (n times)
   (format t "vstack ~dx~d (em)~%" n n)
-  (let ((m (make-matrix n n)))
+  (let ((m (make-matrix n n))
+        (acc 0))
     (tb:with-timing (times)
-      (em:vstack (list m m m) 'double-float)))
+      (incf
+       acc (row-major-aref (em:vstack (list m m m) 'double-float) 0))))
   (format t "vstack ~dx~d (magicl)~%" n n)
   (let ((m (magicl:rand (list n n))))
     (tb:with-timing (times)
@@ -131,9 +133,11 @@
 
 (defun hstack (n times)
   (format t "hstack ~dx~d (em)~%" n n)
-  (let ((m (make-matrix n n)))
+  (let ((m (make-matrix n n))
+        (acc 0))
     (tb:with-timing (times)
-      (em:hstack (list m m m) 'double-float)))
+      (incf
+       acc (row-major-aref (em:hstack (list m m m) 'double-float) 0))))
   (format t "hstack ~dx~d (magicl)~%" n n)
   (let ((m (magicl:rand (list n n))))
     (tb:with-timing (times)
