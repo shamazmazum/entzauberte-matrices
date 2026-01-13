@@ -87,3 +87,30 @@
     (values
      (intern (format nil "%~a" name))
      (format nil "~a_" (string-downcase name)))))
+
+;; Common and very stupid type deriver. The user should always specify
+;; rank for this function to work.
+(defun first-arg-array-type-deriver (call)
+  (let ((type (sb-c::lvar-type (first (sb-c::combination-args call)))))
+    (if (sb-kernel:array-type-p type)
+        (sb-kernel:make-array-type
+         (sb-kernel:array-type-dimensions type)
+         :complexp nil
+         :element-type (sb-kernel:array-type-element-type type)
+         :specialized-element-type (sb-kernel:array-type-specialized-element-type type))
+        (sb-kernel:specifier-type 'simple-array))))
+
+(defmacro def-op-specializers (name args cases error-msg)
+  (let ((type-var (gensym)))
+    `(progn
+       (defun ,name ,args
+         (let ((,type-var (array-element-type ,(first args))))
+           (cond
+             ,@(loop for (type . f) in cases collect
+                     `((equalp ,type-var ',type)
+                       (,f ,@args)))
+             (t (error ,error-msg)))))
+       ,@(loop for (type . f) in cases collect
+               `(sb-c:deftransform ,name
+                    (,args ,(loop repeat (length args) collect t) (simple-array ,type))
+                  '(,f ,@args))))))
