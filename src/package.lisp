@@ -6,7 +6,7 @@
            #:vector->column-unsafe #:vector->row-unsafe
            #:row #:column #:vstack #:hstack
            #:dot #:norm
-           #:mult #:add #:sub #:scale
+           #:@ #:mult #:add #:sub #:scale
            #:det #:inversions #:invert
            #:eig #:eig-self-adjoint #:svd
            #:solve #:transpose

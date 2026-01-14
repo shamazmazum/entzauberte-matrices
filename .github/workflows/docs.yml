@@ -20,6 +20,11 @@ jobs:
         with:
           repository: shamazmazum/docparser
           path: ~/lisp/docparser
+      - name: Checkout scriba
+        uses: actions/checkout@v2
+        with:
+          repository: shamazmazum/scriba
+          path: ~/lisp/scriba
       - name: Install dependencies
         run: |
           sudo apt update

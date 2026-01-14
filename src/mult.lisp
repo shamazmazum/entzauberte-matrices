@@ -111,3 +111,16 @@ and \\(s\\) is a scalar."
         #'mult-cd-unsafe)
        (t (error "Cannot multiply: incompatible element types: ~a and ~a" t1 t2)))
    a b ta tb scale)))
+
+(defun @ (&rest ms)
+  "Left associative multiplication of matrices."
+  (reduce #'mult ms))
+
+(defun @-expander (ms)
+  (reduce
+   (lambda (acc m)
+     `(mult ,acc ,m))
+   ms))
+
+(define-compiler-macro @ (&rest ms)
+  (@-expander ms))

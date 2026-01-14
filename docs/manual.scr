@@ -24,6 +24,7 @@
        @cl:doc(function sub)
        @cl:doc(function scale)
        @cl:doc(function mult)
+       @cl:doc(function @)
        @cl:doc(function det)
        @cl:doc(function invert)
        @cl:doc(function eig)
