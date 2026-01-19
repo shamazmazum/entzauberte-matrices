@@ -88,17 +88,23 @@
      (intern (format nil "%~a" name))
      (format nil "~a_" (string-downcase name)))))
 
+(defun array-type-dimensions (type)
+  (catch 'sb-c::give-up-ir1-transform
+    (return-from array-type-dimensions
+      (sb-c::array-type-dimensions-or-give-up type)))
+  '*)
+
 ;; Common and very stupid type deriver. The user should always specify
 ;; rank for this function to work.
 (defun first-arg-array-type-deriver (call)
-  (let ((type (sb-c::lvar-type (first (sb-c::combination-args call)))))
-    (if (sb-kernel:array-type-p type)
-        (sb-kernel:make-array-type
-         (sb-kernel:array-type-dimensions type)
-         :complexp nil
-         :element-type (sb-kernel:array-type-element-type type)
-         :specialized-element-type (sb-kernel:array-type-specialized-element-type type))
-        (sb-kernel:specifier-type 'simple-array))))
+  (let* ((type (sb-c::lvar-type (first (sb-c::combination-args call))))
+         (et   (sb-c::array-type-upgraded-element-type type))
+         (dims (array-type-dimensions type)))
+    (sb-kernel:make-array-type
+     dims
+     :complexp nil
+     :element-type et
+     :specialized-element-type et)))
 
 (defmacro def-op-specializers (name args cases error-msg)
   (let ((type-var (gensym)))
