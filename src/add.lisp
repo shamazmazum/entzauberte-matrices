@@ -64,16 +64,8 @@
   "Compute \\(s m_1 + m_2\\) where \\(s\\) is a scalar and \\(m_1\\)
 and \\(m_2\\) are two matrices of vectors.. By default \\(s\\) is
 \\(1\\)."
-  (unless (or (and (= (array-rank m1)
-                      (array-rank m2) 2)
-                   (= (array-dimension m1 0)
-                      (array-dimension m2 0))
-                   (= (array-dimension m1 1)
-                      (array-dimension m2 1)))
-              (and (= (array-rank m1)
-                      (array-rank m2) 1)
-                   (= (array-dimension m1 0)
-                      (array-dimension m2 0))))
+  (unless (equalp (array-dimensions m1)
+                  (array-dimensions m2))
     (error "Cannot add matrices: Incompatible dimensions"))
   (let ((t1 (array-element-type m1))
         (t2 (array-element-type m2)))
