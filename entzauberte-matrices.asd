@@ -6,8 +6,8 @@
     :serial t
     :pathname "src"
     :components ((:file "package")
-                 (:file "array-storage-vector")
                  (:file "library")
+                 (:file "array-storage-vector")
                  (:file "utility")
                  (:file "add")
                  (:file "scale")

@@ -7,18 +7,6 @@
 
 (use-foreign-library openblas)
 
-;; Good helper macro
-(defmacro with-array-pointers (bindings &body body)
-  (reduce
-   (lambda (binding acc)
-     (destructuring-bind (ptr array)
-         binding
-       `(with-pointer-to-vector-data (,ptr (array-storage-vector ,array))
-          ,acc)))
-   bindings
-   :initial-value `(progn ,@body)
-   :from-end t))
-
 ;; Utility function to tell OpenBLAS not to use all available CPU
 ;; resources.
 (cffi:defcfun ("goto_set_num_threads" %goto-set-num-threads) :void
@@ -97,7 +85,8 @@
 ;; Common and very stupid type deriver. The user should always specify
 ;; rank for this function to work.
 (defun first-arg-array-type-deriver (call)
-  (let* ((type (sb-c::lvar-type (first (sb-c::combination-args call))))
+  (let* ((array-lvar (first (sb-c::combination-args call)))
+         (type (sb-c::lvar-conservative-type array-lvar))
          (et   (sb-c::array-type-upgraded-element-type type))
          (dims (array-type-dimensions type)))
     (sb-kernel:make-array-type
