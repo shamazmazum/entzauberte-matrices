@@ -7,24 +7,11 @@ on:
 jobs:
   docs:
     runs-on: ubuntu-latest
+    env:
+      LISP: sbcl-bin
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Checkout Codex
-        uses: actions/checkout@v2
-        with:
-          repository: shamazmazum/codex
-          path: ~/lisp/codex
-      - name: Checkout docparser
-        uses: actions/checkout@v2
-        with:
-          repository: shamazmazum/docparser
-          path: ~/lisp/docparser
-      - name: Checkout scriba
-        uses: actions/checkout@v2
-        with:
-          repository: shamazmazum/scriba
-          path: ~/lisp/scriba
       - name: Install dependencies
         run: |
           sudo apt update
@@ -32,12 +19,17 @@ jobs:
       - name: Install roswell
         run: |
           curl -L https://raw.githubusercontent.com/roswell/roswell/master/scripts/install-for-ci.sh | sh
-      - name: Install Ultralisp
+      - name: Install qlot
         run: |
-          ros -e '(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)'
+          ros install qlot
+      - name: Set Path
+        run: |
+          echo "${HOME}/.roswell/bin" >> $GITHUB_PATH
       - name: Build documentation
         run: |
-          ros -s codex -e '(codex:document :entzauberte-matrices)'
+          cd $GITHUB_WORKSPACE
+          qlot install
+          qlot exec ros -s codex -e '(codex:document :entzauberte-matrices)'
       - name: Deploy to GH pages
         uses: peaceiris/actions-gh-pages@v3
         with:

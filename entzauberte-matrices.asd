@@ -46,3 +46,8 @@
     :depends-on (:entzauberte-matrices
                  :magicl
                  :trivial-benchmark))
+
+;; For qlot
+(defsystem :entzauberte-matrices/docs
+    :depends-on (:entzauberte-matrices
+                 :codex))

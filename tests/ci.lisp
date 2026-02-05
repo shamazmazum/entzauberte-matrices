@@ -1,5 +1,8 @@
 (defun do-all()
-  (ql:quickload :entzauberte-matrices/tests)
+  (handler-case
+      (asdf:load-system :entzauberte-matrices/tests)
+    (error ()
+      (uiop:quit 1)))
   (uiop:quit
    (if (uiop:call-function "entzauberte-matrices/tests:run-tests")
        0 1)))
