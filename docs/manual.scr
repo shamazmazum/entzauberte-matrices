@@ -40,6 +40,8 @@
        @cl:doc(function vector->row-unsafe)
        @cl:doc(function hstack)
        @cl:doc(function vstack)
+       @cl:doc(function map)
+       @cl:doc(function zip-with)
        @cl:doc(function set-num-threads)
      )
 @end(section)

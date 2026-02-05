@@ -9,6 +9,7 @@
                  (:file "library")
                  (:file "array-storage-vector")
                  (:file "utility")
+                 (:file "map")
                  (:file "add")
                  (:file "scale")
                  (:file "dot")
