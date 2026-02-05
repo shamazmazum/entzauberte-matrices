@@ -1,5 +1,13 @@
 # Changelog
 
+## Version 0.2
+
+* Incompatible change: `reshape` and `reshape-unsafe` are deprecated. For
+  special cases use `vector->row`, `vector->column` and their unsafe variants.
+* Add `@` for matrix multiplication with left associativity (`(@ a b c)` equals
+  to `(mult (mult a b) c)`).
+* Add `map` and `zip-with` for element-wise unary and binary operations.
+
 ## Version 0.1.1
 
 * Improvement: Add benchmarks
