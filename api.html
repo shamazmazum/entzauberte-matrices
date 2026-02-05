@@ -64,18 +64,19 @@ or a vector.</div></div>
 (resp. \(\hat{B}\)) is \(A\)(resp. \(B\)) if <code>:ta</code>
 (resp. <code>:tb</code>) is <code>nil</code> and \(A^T\)(resp. \(B^T\)) otherwise
 and \(s\) is a scalar.</div></div>
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">@</code><code class="codex-lambda-list">(&amp;rest ms)</code><div class="codex-docstring">Left associative multiplication of matrices.</div></div>
        <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">det</code><code class="codex-lambda-list">(m)</code><div class="codex-docstring">Compute \(\det (M)\) using \(LU\) factorization. Returns
-<code>(values det infocode)</code> where <code>det</code> can be <code>null</code> if \(LU\)
+<code>(values det infocode)</code> where <code>det</code> can be <code>NIL</code> if \(LU\)
 factorization fails.</div></div>
        <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">invert</code><code class="codex-lambda-list">(m)</code><div class="codex-docstring">Compute \(M^{-1}\) using \(LU\) factorization. Returns
-<code>(values inv infocode)</code> where <code>inv</code> can be <code>null</code> if \(LU\)
+<code>(values inv infocode)</code> where <code>inv</code> can be <code>NIL</code> if \(LU\)
 factoirization or inversion routine fails.</div></div>
        <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">eig</code><code class="codex-lambda-list">(m)</code><div class="codex-docstring"><p>Compute eigenvalues and eigenvectors of \(M\). Eigenvectors are
 stored <b>in rows</b>, so that (in pseudo-code)</p><pre><code class="lisp">(multiple-value-bind (vals vecs)
     (eig m)
   (approx= (mult vecs (to-complex m))
            (mult (to-complex (from-diag vals)) vecs)))
-</code></pre><p>is <code>T</code>. The returned values <code>vals</code> and <code>vecs</code> may be <code>null</code> if
+</code></pre><p>is <code>T</code>. The returned values <code>vals</code> and <code>vecs</code> may be <code>NIL</code> if
 the decomposition fails. The third returned value is the info code
 returned by LAPACK.</p></div></div>
        <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">eig-self-adjoint</code><code class="codex-lambda-list">(m where)</code><div class="codex-docstring"><p>Compute eigenvalues and eigenvectors of a self-adjoin matrix
@@ -83,7 +84,7 @@ returned by LAPACK.</p></div></div>
     (eig m)
   (approx= (mult vecs m)
            (mult (from-diag vals) vecs)))
-</code></pre><p>is <code>T</code>. The returned values <code>vals</code> and <code>vecs</code> may be <code>null</code> if
+</code></pre><p>is <code>T</code>. The returned values <code>vals</code> and <code>vecs</code> may be <code>NIL</code> if
 the decomposition fails. The third returned value is the info code
 returned by LAPACK.</p></div></div>
        <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">svd</code><code class="codex-lambda-list">(m &amp;key compact)</code><div class="codex-docstring"><p>Do the singular value decomposition of a matrix \(M = U\Sigma
@@ -102,20 +103,35 @@ that in pseudocode</p><pre><code class="lisp">(multiple-value-bind (U Σ VT)
   (let ((r (min (array-dimension m 0)
                 (array-dimension m 1))))
     (approx= (mult U (mult (from-diag Σ r r) VT)) m)))
-</code></pre><p>is <code>T</code>. The first three returned values may be <code>null</code> if the
+</code></pre><p>is <code>T</code>. The first three returned values may be <code>NIL</code> if the
 decomposition fails. The fourth value is the info code returned by
 LAPACK.</p></div></div>
        <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">transpose</code><code class="codex-lambda-list">(m)</code><div class="codex-docstring">Transpose a matrix \(M\)(slow for big matrices, avoid this
 function if possible).</div></div>
        <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">solve</code><code class="codex-lambda-list">(a b)</code><div class="codex-docstring">Solve an equation \(AX = B\). This function uses <code>transpose</code>
-internally. Return <code>(values X infocode)</code> where <code>X</code> may be <code>null</code>
+internally. Return <code>(values X infocode)</code> where <code>X</code> may be <code>NIL</code>
 if the solver fails.</div></div>
-       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">reshape</code><code class="codex-lambda-list">(m shape)</code><div class="codex-docstring">Reshape an array.</div></div>
-       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">reshape-unsafe</code><code class="codex-lambda-list">(m shape)</code><div class="codex-docstring">Reshape an array. The new array will share the storage with the argument.</div></div>
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">reshape</code><code class="codex-lambda-list">(m shape)</code><div class="codex-docstring">Reshape an array. <b>Deprecated</b>: use <code>column</code>, <code>row</code>,
+<code>vector-&gt;column</code> or <code>vector-&gt;row</code>.</div></div>
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">reshape-unsafe</code><code class="codex-lambda-list">(m shape)</code><div class="codex-docstring">Reshape an array. The new array will share the storage with the
+argument. <b>Deprecated</b>: use <code>column</code>, <code>row</code>,
+<code>vector-&gt;column-unsafe</code> or <code>vector-&gt;row-unsafe</code>.</div></div>
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">vector-&gt;column</code><code class="codex-lambda-list">(m)</code><div class="codex-docstring">Turn a vector to a \(n \times 1\) matrix.</div></div>
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">vector-&gt;column-unsafe</code><code class="codex-lambda-list">(m)</code><div class="codex-docstring">Turn a vector to a \(n \times 1\) matrix. The result will share
+the storage with <code>m</code>.</div></div>
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">vector-&gt;row</code><code class="codex-lambda-list">(m)</code><div class="codex-docstring">Turn a vector to a \(1 \times n\) matrix.</div></div>
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">vector-&gt;row-unsafe</code><code class="codex-lambda-list">(m)</code><div class="codex-docstring">Turn a vector to a \(1 \times n\) matrix. The result will share
+the storage with <code>m</code>.</div></div>
        <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">hstack</code><code class="codex-lambda-list">(ms type)</code><div class="codex-docstring">Concatenate matrices horizontally. The matrices must have the same
 number of rows and the same element type <code>type</code>.</div></div>
        <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">vstack</code><code class="codex-lambda-list">(ms type)</code><div class="codex-docstring">Concatenate matrices vertically. The matrices must have the same
 number of columns and the same element type <code>type</code>.</div></div>
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">map</code><code class="codex-lambda-list">(f element-type m)</code><div class="codex-docstring">Apply an unary operation <code>f</code> to a matrix <code>m</code>
+element-wise. <code>element-type</code> must match the element type of the
+result.</div></div>
+       <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">zip-with</code><code class="codex-lambda-list">(f element-type x y)</code><div class="codex-docstring">Apply a binary operation <code>f</code> to matrices <code>x</code> and <code>y</code>
+element-wise. <code>element-type</code> must match the element type of the
+result.</div></div>
        <div class="codex-doc-node codex-operator codex-function"><code class="codex-name">set-num-threads</code><code class="codex-lambda-list">(n)</code><div class="codex-docstring">Set a number of threads for OpenBLAS.</div></div>
      
 
