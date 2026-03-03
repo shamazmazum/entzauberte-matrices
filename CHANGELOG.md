@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.2.1
+
+* `norm` accepts matrices too. In this case Frobenius norm is computed.
+
 ## Version 0.2
 
 * Incompatible change: `reshape` and `reshape-unsafe` are deprecated. For
