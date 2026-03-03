@@ -59,12 +59,15 @@
       (error "Cannot compute the dot product: Unknown array element types")))
    v1 v2))
 
-(serapeum:-> norm ((vec *))
+(serapeum:-> norm ((mat-or-vec *))
              (values number &optional))
 (declaim (inline norm))
-(defun norm (v)
-  "Compute the norm of \\(v\\), i.e. \\(\\sqrt{\\langle v, v\\rangle}\\)."
+(defun norm (x)
+  "Compute Frobenius norm of a matrix or scalar product induced norm
+of a vector (i.e. \\(\\sqrt{\\langle x, x\\rangle}\\))."
   (sqrt
    ;; Use REALPART to convert to a real. IMAGPART is always 0
-   (realpart
-    (dot v v))))
+   (sb-ext:truly-the (float 0)
+     (realpart
+      (let ((v (array-storage-vector x)))
+        (dot v v))))))
