@@ -2,13 +2,13 @@
 
 (macrolet ((def-foreign-dot (name foreign-type)
              (multiple-value-bind (lisp-name fortran-name)
-                 (wrapper-names name)
+                 (capi-wrapper-names name :blas)
                `(defcfun (,lisp-name ,fortran-name) ,foreign-type
-                  (n    (:pointer :int))
+                  (n    blas-int)
                   (sx   :pointer)
-                  (incx (:pointer :int))
+                  (incx blas-int)
                   (sy   :pointer)
-                  (incy (:pointer :int))))))
+                  (incy blas-int)))))
   ;; Real
   (def-foreign-dot sdot :float)
   (def-foreign-dot ddot :double)
@@ -24,19 +24,13 @@
                              (values ,lisp-type &optional))
                 (defun ,name (v1 v2)
                   (let ((n (length v1)))
-                    (with-foreign-objects ((nptr    :int)
-                                           (incxptr :int)
-                                           (incyptr :int))
-                      (setf (mem-ref nptr    :int) n
-                            (mem-ref incxptr :int) 1
-                            (mem-ref incyptr :int) 1)
-                      (with-array-pointers ((v1ptr v1)
-                                            (v2ptr v2))
-                        ;; The order does not matter now, but for complex
-                        ;; vectors it's v2 v1. BLAS have the arguments swapper
-                        ;; for some reason (it computes v1^H v2, and the dot
-                        ;; product is v2^H v1).
-                        (,low-level-fn nptr v2ptr incxptr v1ptr incyptr))))))))
+                    (with-array-pointers ((v1ptr v1)
+                                          (v2ptr v2))
+                      ;; The order does not matter now, but for complex
+                      ;; vectors it's v2 v1. BLAS have the arguments swapper
+                      ;; for some reason (it computes v1^H v2, and the dot
+                      ;; product is v2^H v1).
+                      (,low-level-fn n v2ptr 1 v1ptr 1)))))))
   (def-dot dot-rs-unsafe %sdot single-float)
   (def-dot dot-rd-unsafe %ddot double-float))
 
