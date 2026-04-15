@@ -76,6 +76,18 @@
      (intern (format nil "%~a" name))
      (format nil "~a_" (string-downcase name)))))
 
+(deftype api () '(member :blas :lapack))
+
+(serapeum:-> capi-wrapper-names (symbol api)
+             (values symbol string &optional))
+(defun capi-wrapper-names (name api)
+  (let ((name (symbol-name name)))
+    (values
+     (intern (format nil "%~a" name))
+     (format nil "~a_~a"
+             (if (eq api :blas) "cblas" "LAPACKE")
+             (string-downcase name)))))
+
 (defun array-type-dimensions (type)
   (catch 'sb-c::give-up-ir1-transform
     (return-from array-type-dimensions

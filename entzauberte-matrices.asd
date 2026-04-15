@@ -6,6 +6,7 @@
     :serial t
     :pathname "src"
     :components ((:file "package")
+                 (:cffi-grovel-file "constants")
                  (:file "library")
                  (:file "array-storage-vector")
                  (:file "utility")
@@ -22,6 +23,7 @@
                  (:file "svd")
                  (:file "solver"))
     :depends-on (:serapeum :cffi)
+    :defsystem-depends-on (:cffi-grovel)
     :in-order-to ((test-op (load-op "entzauberte-matrices/tests")))
     :perform (test-op (op system)
                       (declare (ignore op system))
