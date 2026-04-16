@@ -1,5 +1,6 @@
 (in-package :entzauberte-matrices)
 
+#|
 (macrolet ((def-inv-low-level (name)
              (multiple-value-bind (lisp-name foreign-name)
                  (wrapper-names name)
@@ -84,4 +85,4 @@ factoirization or inversion routine fails."
      (inv-cd-unsafe m))
     (t
      (error "Cannot invert a matrix: Unknown array element type"))))
-
+|#

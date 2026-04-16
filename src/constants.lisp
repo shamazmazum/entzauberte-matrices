@@ -3,12 +3,18 @@
 #+bsd
 (cc-flags "-I/usr/local/include")
 (include "cblas.h")
+(include "lapacke.h")
 
-(ctype blas-int "blasint")
+(ctype blas-int   "blasint")
+(ctype lapack-int "lapack_int")
 
 (cenum cblas-order
   ((:row-major "CblasRowMajor"))
   ((:col-major "CblasColMajor")))
+
+(constantenum lapack-order
+  ((:row-major "LAPACK_ROW_MAJOR"))
+  ((:col-major "LAPACK_COL_MAJOR")))
 
 (cenum cblas-transpose
   ((:no-trans      "CblasNoTrans"))

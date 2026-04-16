@@ -3,14 +3,14 @@
 ;; Low-level bindings
 (macrolet ((def-foreign-lu (name)
              (multiple-value-bind (lisp-name foreign-name)
-                 (wrapper-names name)
-               `(defcfun (,lisp-name ,foreign-name) :void
-                  (m    (:pointer :int))
-                  (n    (:pointer :int))
-                  (a    :pointer)
-                  (lda  (:pointer :int))
-                  (ipiv :pointer)
-                  (info (:pointer :int))))))
+                 (capi-wrapper-names name :lapack)
+               `(defcfun (,lisp-name ,foreign-name) lapack-int
+                  (layout lapack-order)
+                  (m      lapack-int)
+                  (n      lapack-int)
+                  (a      :pointer)
+                  (lda    lapack-int)
+                  (ipiv   :pointer)))))
   (def-foreign-lu sgetrf)
   (def-foreign-lu dgetrf)
   (def-foreign-lu cgetrf)
@@ -24,23 +24,14 @@
                                      (or (svec (unsigned-byte 32)) null)
                                      integer &optional))
                 (defun ,name (a)
-                  (let* (; Number of rows, but our matrix is row-major
-                         (m (array-dimension a 1))
-                         (n (array-dimension a 0)) ; Number of columns
+                  (let* ((m (array-dimension a 0)) ; Number of rows
+                         (n (array-dimension a 1)) ; Number of columns
                          (lda m)
                          (ipiv (make-array (min m n) :element-type '(unsigned-byte 32)))
                          (acopy (copy-array a)))
-                    (with-foreign-objects ((mptr    :int)
-                                           (nptr    :int)
-                                           (ldaptr  :int)
-                                           (infoptr :int))
-                      (setf (mem-ref mptr   :int) m
-                            (mem-ref nptr   :int) n
-                            (mem-ref ldaptr :int) lda)
-                      (with-array-pointers ((aptr    acopy)
-                                            (ipivptr ipiv))
-                        (,low-level-fn mptr nptr aptr ldaptr ipivptr infoptr))
-                      (let ((info (mem-ref infoptr :int)))
+                    (with-array-pointers ((aptr    acopy)
+                                          (ipivptr ipiv))
+                      (let ((info (,low-level-fn :row-major m n aptr lda ipivptr)))
                         (if (zerop info)
                             (values acopy (fix-pivot ipiv) 0)
                             (values nil nil info)))))))))
@@ -55,6 +46,9 @@
                      integer &optional))
 (declaim (inline %lu))
 (defun %lu (a)
+  (when (/= (array-dimension a 0)
+            (array-dimension a 1))
+    (error "This is not tested"))
   (cond
     ((eq (array-element-type a) 'single-float)
      (%lu-rs a))
