@@ -238,7 +238,6 @@
       (setf (aref id i i) (coerce 1 type)))
     id))
 
-#|
 (macrolet ((def-inv-test (type)
              (let ((name (intern
                           (if (listp type)
@@ -257,7 +256,6 @@
   (def-inv-test double-float)
   (def-inv-test (complex single-float))
   (def-inv-test (complex double-float)))
-|#
 
 (in-suite eig)
 

@@ -1,68 +1,39 @@
 (in-package :entzauberte-matrices)
 
-#|
 (macrolet ((def-inv-low-level (name)
              (multiple-value-bind (lisp-name foreign-name)
-                 (wrapper-names name)
-               `(defcfun (,lisp-name ,foreign-name) :void
-                  (n     (:pointer :int))
-                  (a     :pointer)
-                  (lda   (:pointer :int))
-                  (ipiv  :pointer)
-                  (work  :pointer)
-                  (lwork (:pointer :int))
-                  (info  (:pointer :int))))))
+                 (capi-wrapper-names name :lapack)
+               `(defcfun (,lisp-name ,foreign-name) lapack-int
+                  (layout lapack-order)
+                  (n      lapack-int)
+                  (a      :pointer)
+                  (lda    lapack-int)
+                  (ipiv   :pointer)))))
   (def-inv-low-level sgetri)
   (def-inv-low-level dgetri)
   (def-inv-low-level cgetri)
   (def-inv-low-level zgetri))
 
-(macrolet ((def-inv-lisp (name lisp-type foreign-type lufn invfn)
-             (let ((complexp (listp lisp-type)))
-               `(progn
-                  (serapeum:-> ,name ((mat ,lisp-type))
-                               (values (or (smat ,lisp-type) null) integer &optional))
-                  (defun ,name (a)
-                    (let* ((n (array-dimension a 0))
-                           (lda n)
-                           (acopy (copy-array a)))
-                      (with-foreign-objects ((mptr    :int)
-                                             (nptr    :int)
-                                             (ipivptr :int n)
-                                             (ldaptr  :int)
-                                             (infoptr :int))
-                        (flet ((check-info (infoptr)
-                                 (let ((info (mem-ref infoptr :int)))
-                                   (when (< info 0)
-                                     (return-from ,name (values nil info))))))
-                          (setf (mem-ref mptr   :int) n
-                                (mem-ref nptr   :int) n
-                                (mem-ref ldaptr :int) lda)
-                          (with-array-pointers ((aptr acopy))
-                            (,lufn mptr nptr aptr ldaptr ipivptr infoptr)
-                            (check-info infoptr)
-                            (let ((work
-                                    (with-foreign-objects ((workptr
-                                                            ,foreign-type
-                                                            ,@(if complexp '(2)))
-                                                           (lworkptr :int))
-                                      (setf (mem-ref lworkptr :int) -1)
-                                      (,invfn nptr aptr ldaptr ipivptr workptr
-                                              lworkptr infoptr)
-                                      (check-info infoptr)
-                                      (round (mem-ref workptr ,foreign-type)))))
-                              (with-foreign-objects ((workptr
-                                                      :float
-                                                      ,(if complexp `(* work 2) 'work))
-                                                     (lworkptr :int))
-                                (setf (mem-ref lworkptr :int) work)
-                                (,invfn nptr aptr ldaptr ipivptr workptr lworkptr infoptr)
-                                (check-info infoptr))))))
-                      (values acopy 0)))))))
-  (def-inv-lisp inv-rs-unsafe single-float :float  %sgetrf %sgetri)
-  (def-inv-lisp inv-rd-unsafe double-float :double %dgetrf %dgetri)
-  (def-inv-lisp inv-cs-unsafe (complex single-float) :float  %cgetrf %cgetri)
-  (def-inv-lisp inv-cd-unsafe (complex double-float) :double %zgetrf %zgetri))
+(macrolet ((def-inv-lisp (name lisp-type lufn invfn)
+             `(progn
+                (serapeum:-> ,name ((mat ,lisp-type))
+                             (values (or (smat ,lisp-type) null) integer &optional))
+                (defun ,name (a)
+                  (let ((n (array-dimension a 0))
+                        (acopy (copy-array a)))
+                    (with-foreign-object (ipivptr :int n)
+                      (with-array-pointers ((aptr acopy))
+                        (let ((info (,lufn  :row-major n n aptr n ipivptr)))
+                          (if (zerop info)
+                              (let ((info (,invfn :row-major n aptr n ipivptr)))
+                                (if (zerop info)
+                                    (values acopy 0)
+                                    (values nil info)))
+                              (values nil info))))))))))
+  (def-inv-lisp inv-rs-unsafe single-float %sgetrf %sgetri)
+  (def-inv-lisp inv-rd-unsafe double-float %dgetrf %dgetri)
+  (def-inv-lisp inv-cs-unsafe (complex single-float) %cgetrf %cgetri)
+  (def-inv-lisp inv-cd-unsafe (complex double-float) %zgetrf %zgetri))
 
 (serapeum:-> invert ((mat *))
              (values (or (smat *) null) integer &optional))
@@ -85,4 +56,3 @@ factoirization or inversion routine fails."
      (inv-cd-unsafe m))
     (t
      (error "Cannot invert a matrix: Unknown array element type"))))
-|#
