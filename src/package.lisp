@@ -11,5 +11,5 @@
            #:@ #:mult #:add #:sub #:scale
            #:det #:inversions #:invert
            #:eig #:eig-self-adjoint #:svd
-           #:solve #:transpose
+           #:solve #:transpose #:transpose-legacy
            #:set-num-threads))

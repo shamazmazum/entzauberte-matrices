@@ -23,6 +23,8 @@
        @cl:doc(function add)
        @cl:doc(function sub)
        @cl:doc(function scale)
+       @cl:doc(type transpose-legacy)
+       @cl:doc(type transpose)
        @cl:doc(function mult)
        @cl:doc(function @)
        @cl:doc(function det)
