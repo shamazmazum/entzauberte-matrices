@@ -55,13 +55,13 @@
                      integer &optional))
 (declaim (inline eig-self-adjoint))
 (defun eig-self-adjoint (m where)
-    "Compute eigenvalues and eigenvectors of a self-adjoin matrix
+    "Compute eigenvalues and eigenvectors of a self-adjoint matrix
 \\(M\\). Since version 0.3 eigenvectors are stored @b(in columns) as
 usual, so that (in pseudo-code)
 
 @begin[lang=lisp](code)
 (multiple-value-bind (vals vecs)
-    (eig m)
+    (eig-self-adjoint m)
   (approx= (mult m vecs)
            (mult vecs (from-diag vals))))
 @end(code)

@@ -184,8 +184,8 @@ stored @b(in rows), so that (in pseudo-code)
 @begin[lang=lisp](code)
 (multiple-value-bind (vals vecs)
     (eig m)
-  (approx= (mult vecs (to-complex m))
-           (mult (to-complex (from-diag vals)) vecs)))
+  (approx= (mult vecs m)
+           (mult (from-diag vals) vecs)))
 @end(code)
 
 is @c(T). The returned values @c(vals) and @c(vecs) may be @c(NIL) if
