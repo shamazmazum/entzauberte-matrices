@@ -2,6 +2,8 @@
 
 #+bsd
 (cc-flags "-I/usr/local/include")
+;; On some platforms the header is here
+(cc-flags "-I/usr/include/openblas")
 (include "cblas.h")
 (include "lapacke.h")
 

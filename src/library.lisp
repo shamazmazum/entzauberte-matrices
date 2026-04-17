@@ -4,8 +4,15 @@
   (:unix  (:or "libopenblas.so"
                "libopenblas.so.0"))
   (t (:default "libopenblas")))
-
 (use-foreign-library openblas)
+
+;; Some if not all fucking linux distributions build openblas without
+;; lapacke. Use slow implementation on linux
+(define-foreign-library lapacke
+  (:unix  (:or "liblapacke.so"))
+  (t (:default "liblapacke")))
+#+linux
+(use-foreign-library lapacke)
 
 ;; Utility function to tell OpenBLAS not to use all available CPU
 ;; resources.
