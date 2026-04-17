@@ -259,7 +259,18 @@
 
 (in-suite eig)
 
-(defun multiply-eig (%t Λ)
+(defun multiply-eig (Λ %t)
+  (let ((result (make-array (array-dimensions %t)
+                            :element-type (array-element-type %t))))
+    (loop for i below (array-dimension result 0) do
+      (loop for j below (array-dimension result 1) do
+        (setf (aref result i j)
+              (* (aref %t i j)
+                 (aref Λ j)))))
+    result))
+
+;; TODO: To be removed
+(defun %multiply-eig (%t Λ)
   (let ((result (make-array (array-dimensions %t)
                             :element-type (array-element-type %t))))
     (loop for i below (array-dimension result 0) do
@@ -291,8 +302,8 @@
                           (flet ((check (Λ %t info)
                                    (declare (ignore info))
                                    (is-true (array-approx-p
-                                             (em:mult %t a)
-                                             (multiply-eig %t Λ)))))
+                                             (em:mult a %t)
+                                             (multiply-eig Λ %t)))))
                             (multiple-value-call #'check
                               (em:eig-self-adjoint a :upper))
                             (multiple-value-call #'check
@@ -315,7 +326,7 @@
                               (em:eig a)
                             (is-true (array-approx-p
                                       (em:mult %T (convert-to-complex a))
-                                      (multiply-eig %T Λ)))))))))
+                                      (%multiply-eig %T Λ)))))))))
   (def-eig-test single-float)
   (def-eig-test double-float)
   (def-eig-test (complex single-float))
