@@ -269,17 +269,6 @@
                  (aref Λ j)))))
     result))
 
-;; TODO: To be removed
-(defun %multiply-eig (%t Λ)
-  (let ((result (make-array (array-dimensions %t)
-                            :element-type (array-element-type %t))))
-    (loop for i below (array-dimension result 0) do
-      (loop for j below (array-dimension result 1) do
-        (setf (aref result i j)
-              (* (aref %t i j)
-                 (aref Λ i)))))
-    result))
-
 (defun convert-to-complex (a)
   (let ((type (array-element-type a)))
     (if (listp type) a
@@ -325,8 +314,8 @@
                           (multiple-value-bind (Λ %T)
                               (em:eig a)
                             (is-true (array-approx-p
-                                      (em:mult %T (convert-to-complex a))
-                                      (%multiply-eig %T Λ)))))))))
+                                      (em:mult (convert-to-complex a) %t)
+                                      (multiply-eig Λ %t)))))))))
   (def-eig-test single-float)
   (def-eig-test double-float)
   (def-eig-test (complex single-float))

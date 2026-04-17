@@ -2,32 +2,29 @@
 
 (macrolet ((def-eig-low-level (name complexp)
              (multiple-value-bind (lisp-name foreign-name)
-                 (wrapper-names name)
-               `(defcfun (,lisp-name ,foreign-name) :void
-                  (jobvl (:pointer :char))
-                  (jobvr (:pointer :char))
-                  (n     (:pointer :int))
+                 (capi-wrapper-names name :lapack)
+               `(defcfun (,lisp-name ,foreign-name) lapack-int
+                  (layout lapack-order)
+                  (jobvl :char)
+                  (jobvr :char)
+                  (n     lapack-int)
                   (a     :pointer)
-                  (lda   (:pointer :int))
+                  (lda   lapack-int)
                   ,@(if complexp
                         `((w  :pointer))
                         `((wr :pointer)
                           (wi :pointer)))
                   (vl    :pointer)
-                  (ldvl  (:pointer :int))
+                  (ldvl  lapack-int)
                   (vr    :pointer)
-                  (ldvr  (:pointer :int))
-                  (work  :pointer)
-                  (lwork (:pointer :int))
-                  ,@(if complexp `((rwork :pointer)))
-                  (info  (:pointer :int))))))
+                  (ldvr  lapack-int)))))
   (def-eig-low-level sgeev nil)
   (def-eig-low-level dgeev nil)
   (def-eig-low-level cgeev t)
   (def-eig-low-level zgeev t))
 
-;; Real
-(macrolet ((def-eig (name low-level-fn lisp-type foreign-type)
+;; Complex
+(macrolet ((def-eig (name low-level-fn lisp-type)
              `(progn
                 (serapeum:-> ,name ((mat ,lisp-type))
                              (values (or (svec ,lisp-type) null)
@@ -40,55 +37,22 @@
                          (copy (copy-array a))
                          (vals    (make-array n :element-type ',lisp-type))
                          (vecs    (make-array (list n n) :element-type ',lisp-type)))
-                    (with-foreign-objects ((jobvlptr :char)
-                                           (jobvrptr :char)
-                                           (nptr     :int)
-                                           (ldaptr   :int)
-                                           (ldvlptr  :int)
-                                           (ldvrptr  :int)
-                                           (rworkptr ,foreign-type (* n 2))
-                                           (infoptr  :int))
-                      (flet ((check-info ()
-                               (let ((info (mem-ref infoptr :int)))
-                                 (unless (zerop info)
-                                   (return-from ,name (values nil nil info))))))
-                        (setf (mem-ref jobvlptr :char)
-                              ;; To be consistent with EIG-SELF-ADJOINT
-                              (char-code #\N)
-                              (mem-ref jobvrptr :char)
-                              (char-code #\V)
-                              (mem-ref nptr :int) n
-                              (mem-ref ldaptr :int) lda
-                              ;; FIXME ldvl >= 1
-                              (mem-ref ldvlptr :int) 1
-                              (mem-ref ldvrptr :int) n)
-                        (with-array-pointers ((aptr  copy)
-                                              (wptr  vals)
-                                              (vrptr vecs))
-                          (let ((work
-                                  (with-foreign-objects ((workptr  ,foreign-type 2)
-                                                         (lworkptr :int))
-                                    (setf (mem-ref lworkptr :int) -1)
-                                    (,low-level-fn jobvlptr jobvrptr nptr aptr ldaptr
-                                                   wptr (null-pointer) ldvlptr vrptr
-                                                   ldvrptr workptr lworkptr rworkptr
-                                                   infoptr)
-                                    (check-info)
-                                    (round (mem-ref workptr ,foreign-type)))))
-                            (with-foreign-objects ((workptr  ,foreign-type (* work 2))
-                                                   (lworkptr :int))
-                              (setf (mem-ref lworkptr :int) work)
-                              (,low-level-fn jobvlptr jobvrptr nptr aptr ldaptr
-                                                   wptr (null-pointer) ldvlptr vrptr
-                                                   ldvrptr workptr lworkptr rworkptr
-                                                   infoptr)
-                              (check-info))))))
-                    (values vals vecs 0))))))
-  (def-eig eig-cs-unsafe %cgeev (complex single-float) :float)
-  (def-eig eig-cd-unsafe %zgeev (complex double-float) :double))
+                    (with-array-pointers ((aptr  copy)
+                                          (wptr  vals)
+                                          (vrptr vecs))
+                      (let ((info (,low-level-fn :row-major
+                                                 (char-code #\N)
+                                                 (char-code #\V)
+                                                 n aptr lda wptr
+                                                 (null-pointer) 1
+                                                 vrptr n)))
+                        (if (zerop info)
+                            (values vals vecs 0)
+                            (values nil nil info)))))))))
+  (def-eig eig-cs-unsafe %cgeev (complex single-float))
+  (def-eig eig-cd-unsafe %zgeev (complex double-float)))
 
-;; Complex
-(macrolet ((def-eig (name low-level-fn lisp-type foreign-type)
+(macrolet ((def-eig (name low-level-fn lisp-type)
              `(progn
                 (serapeum:-> ,name ((mat ,lisp-type))
                              (values (or (svec (complex ,lisp-type)) null)
@@ -104,73 +68,41 @@
                          (vals-im (make-array n :element-type ',lisp-type))
                          (vecs-re (make-array (list n n) :element-type ',lisp-type))
                          (vecs    (make-array (list n n) :element-type '(complex ,lisp-type))))
-                    (with-foreign-objects ((jobvlptr :char)
-                                           (jobvrptr :char)
-                                           (nptr     :int)
-                                           (ldaptr   :int)
-                                           (ldvlptr  :int)
-                                           (ldvrptr  :int)
-                                           (infoptr  :int))
-                      (flet ((check-info ()
-                               (let ((info (mem-ref infoptr :int)))
-                               (unless (zerop info)
-                                 (return-from ,name (values nil nil info))))))
-                        (setf (mem-ref jobvlptr :char)
-                              ;; To be consistent with EIG-SELF-ADJOINT
-                              (char-code #\N)
-                              (mem-ref jobvrptr :char)
-                              (char-code #\V)
-                              (mem-ref nptr :int) n
-                              (mem-ref ldaptr :int) lda
-                              ;; FIXME ldvl >= 1
-                              (mem-ref ldvlptr :int) 1
-                              (mem-ref ldvrptr :int) n)
-                        (with-array-pointers ((aptr copy)
-                                              (wrptr vals-re)
-                                              (wiptr vals-im)
-                                              (vrptr vecs-re))
-                          (let ((work
-                                  (with-foreign-objects ((workptr  ,foreign-type)
-                                                         (lworkptr :int))
-                                    (setf (mem-ref lworkptr :int) -1)
-                                    (,low-level-fn jobvlptr jobvrptr nptr aptr ldaptr
-                                                   wrptr wiptr (null-pointer)
-                                                   ldvlptr vrptr ldvrptr workptr lworkptr
-                                                   infoptr)
-                                    (check-info)
-                                    (round (mem-ref workptr ,foreign-type)))))
-                            (with-foreign-objects ((workptr  ,foreign-type work)
-                                                   (lworkptr :int))
-                              (setf (mem-ref lworkptr :int) work)
-                              (,low-level-fn jobvlptr jobvrptr nptr aptr ldaptr
-                                             wrptr wiptr (null-pointer)
-                                             ldvlptr vrptr ldvrptr workptr lworkptr infoptr)
-                              (check-info))))))
-                    (loop for i below n do
-                      (setf (aref vals i)
-                            (complex
-                             (aref vals-re i)
-                             (aref vals-im i))))
-                    (loop for i below n
-                          for im = (aref vals-im i) do
-                      (cond
-                        ((zerop im)
-                         (loop for j below n do
-                           (setf (aref vecs i j)
-                                 (complex (aref vecs-re i j)))))
-                        ((> im 0)
-                         (loop for j below n do
-                           (setf (aref vecs i j)
-                                 (complex (aref vecs-re ( + i) j)
-                                          (aref vecs-re (1+ i) j)))))
-                        ((< im 0)
-                         (loop for j below n do
-                           (setf (aref vecs i j)
-                                 (complex (+ (aref vecs-re (1- i) j))
-                                          (- (aref vecs-re ( + i) j))))))))
-                    (values vals vecs 0))))))
-  (def-eig eig-rs-unsafe %sgeev single-float :float)
-  (def-eig eig-rd-unsafe %dgeev double-float :double))
+                    (with-array-pointers ((aptr copy)
+                                          (wrptr vals-re)
+                                          (wiptr vals-im)
+                                          (vrptr vecs-re))
+                      (let ((info (,low-level-fn :row-major
+                                                 (char-code #\N)
+                                                 (char-code #\V)
+                                                 n aptr lda wrptr wiptr
+                                                 (null-pointer) 1
+                                                 vrptr n)))
+                        (cond
+                          ((not (zerop info))
+                           (values nil nil info))
+                          (t
+                           (loop for i below n do
+                             (setf (aref vals i)
+                                   (complex
+                                    (aref vals-re i)
+                                    (aref vals-im i))))
+                           (loop for i below n do
+                             (loop for j below n do
+                               (let ((im (imagpart (aref vals j))))
+                                 (setf (aref vecs i j)
+                                       (cond
+                                         ((zerop im)
+                                          (complex (aref vecs-re i j)))
+                                         ((> im 0)
+                                          (complex (aref vecs-re i ( + j))
+                                                   (aref vecs-re i (1+ j))))
+                                         (t
+                                          (complex (+ (aref vecs-re i (1- j)))
+                                                   (- (aref vecs-re i ( + j))))))))))
+                           (values vals vecs 0))))))))))
+  (def-eig eig-rs-unsafe %sgeev single-float)
+  (def-eig eig-rd-unsafe %dgeev double-float))
 
 (serapeum:-> eig ((mat *))
              (values (or (svec *) null)
@@ -178,18 +110,19 @@
                      integer &optional))
 (declaim (inline eig))
 (defun eig (m)
-  "Compute eigenvalues and eigenvectors of \\(M\\). Eigenvectors are
-stored @b(in rows), so that (in pseudo-code)
+  "Compute eigenvalues and eigenvectors of \\(M\\). Since version 0.3
+eigenvectors are stored @b(in columns), so that (in pseudo-code)
 
 @begin[lang=lisp](code)
 (multiple-value-bind (vals vecs)
     (eig m)
-  (approx= (mult vecs m)
-           (mult (from-diag vals) vecs)))
+  (approx= (mult m vecs)
+           (mult vecs (from-diag vals))))
 @end(code)
 
-is @c(T). The returned values @c(vals) and @c(vecs) may be @c(NIL) if
-the decomposition fails. The third returned value is the info code
+is @c(T). Before version 0.2 eigenvectors were stored @b(in rows). The
+returned values @c(vals) and @c(vecs) may be @c(NIL) if the
+decomposition fails. The third returned value is the info code
 returned by LAPACK."
   (assert (= (array-dimension m 0)
              (array-dimension m 1)))
