@@ -68,14 +68,6 @@
     new-indices))
 
 ;; Function for generating wrapper names
-(serapeum:-> wrapper-names (symbol)
-             (values symbol string &optional))
-(defun wrapper-names (name)
-  (let ((name (symbol-name name)))
-    (values
-     (intern (format nil "%~a" name))
-     (format nil "~a_" (string-downcase name)))))
-
 (deftype api () '(member :blas :lapack))
 
 (serapeum:-> capi-wrapper-names (symbol api)
