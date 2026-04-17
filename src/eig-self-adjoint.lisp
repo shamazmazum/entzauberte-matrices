@@ -41,6 +41,7 @@
                                      (char-code
                                       (if (eq where :upper) #\U #\L))
                                      n aptr lda wptr)))
+                          (declare (type fixnum info))
                           (if (zerop info)
                               (values vals copy 0)
                               (values nil nil info))))))))))

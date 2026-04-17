@@ -32,6 +32,7 @@
                     (with-array-pointers ((aptr    acopy)
                                           (ipivptr ipiv))
                       (let ((info (,low-level-fn :row-major m n aptr lda ipivptr)))
+                        (declare (type fixnum info))
                         (if (zerop info)
                             (values acopy (fix-pivot ipiv) 0)
                             (values nil nil info)))))))))

@@ -78,6 +78,7 @@
                                                  n aptr lda wrptr wiptr
                                                  (null-pointer) 1
                                                  vrptr n)))
+                        (declare (type fixnum info))
                         (cond
                           ((not (zerop info))
                            (values nil nil info))
