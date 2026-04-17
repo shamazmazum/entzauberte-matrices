@@ -62,7 +62,7 @@ usual, so that (in pseudo-code)
 
 @begin[lang=lisp](code)
 (multiple-value-bind (vals vecs)
-    (eig-self-adjoint m)
+    (eig-self-adjoint m where)
   (approx= (mult m vecs)
            (mult vecs (from-diag vals))))
 @end(code)

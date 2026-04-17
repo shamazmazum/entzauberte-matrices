@@ -45,9 +45,8 @@
              (values (or (smat *) null) integer &optional))
 (declaim (inline solve))
 (defun solve (a b)
-  "Solve an equation \\(AX = B\\). This function uses @c(transpose)
-internally. Return @c((values X infocode)) where @c(X) may be @c(NIL)
-if the solver fails."
+  "Solve an equation \\(AX = B\\). Return @c((values X infocode))
+where @c(X) may be @c(NIL) if the solver fails."
   (assert (= (array-dimension a 0)
              (array-dimension a 1)
              (array-dimension b 0)))

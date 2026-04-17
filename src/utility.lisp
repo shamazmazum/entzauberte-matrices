@@ -43,7 +43,7 @@ the storage with @c(m)."
               :displaced-to m))
 
 (declaim (inline reshape)
-         (sb-ext:deprecated :early "0.2" (function reshape)))
+         (sb-ext:deprecated :late "0.2" (function reshape)))
 (defun reshape (m shape)
   "Reshape an array. @b(Deprecated): use @c(column), @c(row),
 @c(vector->column) or @c(vector->row)."
@@ -58,7 +58,7 @@ the storage with @c(m)."
     result))
 
 (declaim (inline reshape-unsafe)
-         (sb-ext:deprecated :early "0.2" (function reshape-unsafe)))
+         (sb-ext:deprecated :late "0.2" (function reshape-unsafe)))
 (defun reshape-unsafe (m shape)
   "Reshape an array. The new array will share the storage with the
 argument. @b(Deprecated): use @c(column), @c(row),

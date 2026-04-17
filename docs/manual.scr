@@ -32,7 +32,6 @@
        @cl:doc(function eig)
        @cl:doc(function eig-self-adjoint)
        @cl:doc(function svd)
-       @cl:doc(function transpose)
        @cl:doc(function solve)
        @cl:doc(function reshape)
        @cl:doc(function reshape-unsafe)
