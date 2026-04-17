@@ -1,64 +1,41 @@
 (in-package :entzauberte-matrices)
 
-(declaim (inline transpose))
-(defun transpose (m)
-  "Transpose a matrix \\(M\\) (slow for big matrices, avoid this
-function if possible)."
-  (let ((res (make-array (reverse (array-dimensions m))
-                         :element-type (array-element-type m))))
-    (loop for i below (array-dimension m 0) do
-      (loop for j below (array-dimension m 1) do
-        (setf (aref res j i) (aref m i j))))
-    res))
-
 (macrolet ((def-solver-low-level (name)
              (multiple-value-bind (lisp-name foreign-name)
-                 (wrapper-names name)
-               `(defcfun (,lisp-name ,foreign-name) :void
-                  (n    (:pointer :int))
-                  (nrhs (:pointer :int))
-                  (a    :pointer)
-                  (lda  (:pointer :int))
-                  (ipiv :pointer)
-                  (b    :pointer)
-                  (ldb  (:pointer :int))
-                  (info (:pointer :int))))))
+                 (capi-wrapper-names name :lapack)
+               `(defcfun (,lisp-name ,foreign-name) lapack-int
+                  (layout lapack-order)
+                  (n      lapack-int)
+                  (nrhs   lapack-int)
+                  (a      :pointer)
+                  (lda    lapack-int)
+                  (ipiv   :pointer)
+                  (b      :pointer)
+                  (ldb    lapack-int)))))
   (def-solver-low-level sgesv)
   (def-solver-low-level dgesv)
   (def-solver-low-level cgesv)
   (def-solver-low-level zgesv))
 
-;; Here we must to transpose, not copy. Otherwise we'll solve xA=b
 (macrolet ((def-solve (name low-level-fn lisp-type)
              `(progn
                 (serapeum:-> ,name ((mat ,lisp-type)
                                     (mat ,lisp-type))
                              (values (or (smat ,lisp-type) null) integer &optional))
                 (defun ,name (a b)
-                  (let ((acopy (transpose a))
-                        (bcopy (transpose b))
-                        (n    (array-dimension a 0))
-                        (nrhs (array-dimension b 1)))
-                    (with-foreign-objects ((nptr    :int)
-                                           (nrhsptr :int)
-                                           (ldaptr  :int)
-                                           (ipivptr :int n)
-                                           (ldbptr  :int)
-                                           (infoptr :int))
-                      (flet ((check-info ()
-                               (let ((info (mem-ref infoptr :int)))
-                                 (unless (zerop info)
-                                   (return-from ,name (values nil info))))))
-                        (setf (mem-ref nptr    :int) n
-                              (mem-ref nrhsptr :int) nrhs
-                              (mem-ref ldaptr  :int) n
-                              (mem-ref ldbptr  :int) n)
-                        (with-array-pointers ((aptr acopy)
-                                              (bptr bcopy))
-                          (,low-level-fn
-                           nptr nrhsptr aptr ldaptr ipivptr bptr ldbptr infoptr)
-                          (check-info))))
-                    (values (transpose bcopy) 0))))))
+                  (let ((acopy (copy-array a))
+                        (bcopy (copy-array b))
+                        (n     (array-dimension a 0))
+                        (nrhs  (array-dimension b 1)))
+                    (with-array-pointers ((aptr acopy)
+                                          (bptr bcopy))
+                      (with-foreign-object (ipivptr 'lapack-int n)
+                        (let ((info (,low-level-fn :row-major n nrhs aptr n 
+                                                   ipivptr bptr nrhs)))
+                          (declare (type fixnum info))
+                          (if (zerop info)
+                              (values bcopy 0)
+                              (values nil info))))))))))
   (def-solve solve-rs-unsafe %sgesv single-float)
   (def-solve solve-rd-unsafe %dgesv double-float)
   (def-solve solve-cs-unsafe %cgesv (complex single-float))

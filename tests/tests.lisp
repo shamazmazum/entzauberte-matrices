@@ -18,6 +18,15 @@
                      (results-status status)))
                  '(dot algebra det inv eig svd solver misc))))
 
+(declaim (inline transpose))
+(defun transpose (m)
+  (let ((res (make-array (reverse (array-dimensions m))
+                         :element-type (array-element-type m))))
+    (loop for i below (array-dimension m 0) do
+      (loop for j below (array-dimension m 1) do
+        (setf (aref res j i) (aref m i j))))
+    res))
+
 (declaim (inline conjugate-transpose))
 (defun conjugate-transpose (m)
   (let ((res (make-array (reverse (array-dimensions m))
@@ -136,12 +145,12 @@
                         for b  = (random-matrix k m ',type)
                         for bt = (random-matrix m k ',type) do
                           (is-true (array-approx-p (matrix-mul a b) (em:mult a b)))
-                          (is-true (array-approx-p (matrix-mul (em:transpose at) b)
+                          (is-true (array-approx-p (matrix-mul (transpose at) b)
                                                    (em:mult at b :ta t)))
-                          (is-true (array-approx-p (matrix-mul a (em:transpose bt))
+                          (is-true (array-approx-p (matrix-mul a (transpose bt))
                                                    (em:mult a bt :tb t)))
-                          (is-true (array-approx-p (matrix-mul (em:transpose at)
-                                                               (em:transpose bt))
+                          (is-true (array-approx-p (matrix-mul (transpose at)
+                                                               (transpose bt))
                                    (em:mult at bt :ta t :tb t))))))))
   (def-multiplication-test single-float)
   (def-multiplication-test double-float)
@@ -417,8 +426,8 @@
         for m2 = (random-matrix r c2 'single-float)
         for m3 = (random-matrix r c3 'single-float) do
           (is-true
-           (equalp (em:transpose (em:hstack (list m1 m2 m3) 'single-float))
-                   (em:vstack (list (em:transpose m1)
-                                    (em:transpose m2)
-                                    (em:transpose m3))
+           (equalp (transpose (em:hstack (list m1 m2 m3) 'single-float))
+                   (em:vstack (list (transpose m1)
+                                    (transpose m2)
+                                    (transpose m3))
                               'single-float)))))
