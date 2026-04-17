@@ -1,28 +1,26 @@
 (in-package :entzauberte-matrices)
 
-(macrolet ((def-svd-low-level (name complexp)
+(macrolet ((def-svd-low-level (name)
              (multiple-value-bind (lisp-name foreign-name)
-                 (wrapper-names name)
-               `(defcfun (,lisp-name ,foreign-name) :void
-                  (jobu  (:pointer :char))
-                  (jobvt (:pointer :char))
-                  (m     (:pointer :int))
-                  (n     (:pointer :int))
-                  (a     :pointer)
-                  (lda   (:pointer :int))
-                  (s     :pointer)
-                  (u     :pointer)
-                  (ldu   (:pointer :int))
-                  (vt    :pointer)
-                  (ldvt  (:pointer :int))
-                  (work  :pointer)
-                  (lwork (:pointer :int))
-                  ,@(if complexp `((rwork :pointer)))
-                  (info  (:pointer :int))))))
-  (def-svd-low-level sgesvd nil)
-  (def-svd-low-level dgesvd nil)
-  (def-svd-low-level cgesvd t)
-  (def-svd-low-level zgesvd t))
+                 (capi-wrapper-names name :lapack)
+               `(defcfun (,lisp-name ,foreign-name) lapack-int
+                  (layout lapack-order)
+                  (jobu   :char)
+                  (jobvt  :char)
+                  (m      lapack-int)
+                  (n      lapack-int)
+                  (a      :pointer)
+                  (lda    lapack-int)
+                  (s      :pointer)
+                  (u      :pointer)
+                  (ldu    lapack-int)
+                  (vt     :pointer)
+                  (ldvt   lapack-int)
+                  (superb :pointer)))))
+  (def-svd-low-level sgesvd)
+  (def-svd-low-level dgesvd)
+  (def-svd-low-level cgesvd)
+  (def-svd-low-level zgesvd))
 
 (macrolet ((def-svd (name low-level-fn lisp-type foreign-type)
              (let* ((complexp (listp lisp-type))
@@ -35,65 +33,30 @@
                                        integer
                                        &optional))
                   (defun ,name (a compact)
-                    (let* ((m (array-dimension a 1)) ; Number of rows in A^T
-                           (n (array-dimension a 0)) ; Number of columns in A^T
+                    (let* ((m (array-dimension a 0))
+                           (n (array-dimension a 1))
                            (min (min n m))
                            (acopy (copy-array a))
                            (s  (make-array min  :element-type ',real-type))
-                           (u  (make-array (list (if compact min m) m)
+                           (u  (make-array (list m (if compact min m))
                                            :element-type ',lisp-type))
-                           (vt (make-array (list n (if compact min n))
-                                           :element-type ',lisp-type)))
-                      (with-foreign-objects ((jobuptr  :char)
-                                             (jobvtptr :char)
-                                             (mptr     :int)
-                                             (nptr     :int)
-                                             (ldaptr   :int)
-                                             (lduptr   :int)
-                                             (ldvtptr  :int)
-                                             ,@(if complexp
-                                                   `((rworkptr ,foreign-type
-                                                               (* min 5))))
-                                             (infoptr  :int))
-                        (flet ((check-info ()
-                                 (let ((info (mem-ref infoptr :int)))
-                                   (unless (zerop info)
-                                     (return-from ,name (values nil nil nil info))))))
-                          (with-array-pointers ((aptr  acopy)
-                                                (sptr  s)
-                                                (uptr  u)
-                                                (vtptr vt))
-                            (setf (mem-ref jobuptr :char)
-                                  (char-code (if compact #\S #\A))
-                                  (mem-ref jobvtptr :char)
-                                  (char-code (if compact #\S #\A))
-                                  (mem-ref mptr :int) m
-                                  (mem-ref nptr :int) n
-                                  (mem-ref ldaptr :int) m
-                                  (mem-ref lduptr :int) m
-                                  (mem-ref ldvtptr :int) (if compact min n))
-                            (let ((work
-                                    (with-foreign-objects ((workptr
-                                                            ,foreign-type ,(if complexp 2 1))
-                                                           (lworkptr :int))
-                                      (setf (mem-ref lworkptr :int) -1)
-                                      (,low-level-fn jobuptr jobvtptr mptr nptr aptr ldaptr
-                                                     sptr uptr lduptr vtptr ldvtptr workptr
-                                                     lworkptr ,@(if complexp '(rworkptr))
-                                                     infoptr)
-                                      (check-info)
-                                      (round (mem-ref workptr ,foreign-type)))))
-                              (with-foreign-objects ((workptr
-                                                      ,foreign-type
-                                                      ,(if complexp '(* work 2) 'work))
-                                                     (lworkptr :int))
-                                (setf (mem-ref lworkptr :int) work)
-                                (,low-level-fn jobuptr jobvtptr mptr nptr aptr ldaptr
-                                               sptr uptr lduptr vtptr ldvtptr workptr
-                                               lworkptr ,@(if complexp '(rworkptr))
-                                               infoptr)
-                                (check-info))))))
-                      (values vt s u 0)))))))
+                           (vt (make-array (list (if compact min n) n)
+                                           :element-type ',lisp-type))
+                           (job (char-code (if compact #\S #\A))))
+                      (with-array-pointers ((aptr    acopy)
+                                            (sptr    s)
+                                            (uptr    u)
+                                            (vtptr   vt))
+                        (with-foreign-object (sprbptr ,foreign-type (1- min))
+                          (let ((info (,low-level-fn :row-major
+                                                     job job m n aptr
+                                                     n sptr uptr
+                                                     (if compact min m)
+                                                     vtptr n sprbptr)))
+                            (declare (type fixnum info))
+                            (if (zerop info)
+                                (values u s vt 0)
+                                (values nil nil nil info)))))))))))
   (def-svd svd-rs %sgesvd single-float :float)
   (def-svd svd-rd %dgesvd double-float :double)
   (def-svd svd-cs %cgesvd (complex single-float) :float)
@@ -126,7 +89,7 @@ that in pseudocode
 
 @begin[lang=lisp](code)
 (multiple-value-bind (U Σ VT)
-    (svd m)
+    (svd m :compact t)
   (let ((r (min (array-dimension m 0)
                 (array-dimension m 1))))
     (approx= (mult U (mult (from-diag Σ r r) VT)) m)))
