@@ -102,8 +102,8 @@ that elements of the matrix become complex adjoints."
 (defun mult (a b &key (ta :no-trans) (tb :no-trans) (scale (coerce 1 (array-element-type a))))
   "Compute a product of two matrices \\(s A^* B^*\\) where \\(A^*\\)
 and \\(B^*\\) are derived from \\(A\\) and \\(B\\) accordingly to
-@c(:ta) and @c(:tb) arguments of type @c(transpose) and \\(s\\) is a
-scalar @c(scale)."
+@c(:ta) and @c(:tb) arguments of type @c(transpose-legacy) and \\(s\\)
+is a scalar @c(scale)."
   (let* ((ta  (transpose-to-keyword ta))
          (tb  (transpose-to-keyword tb))
          (tap (transpose-required-p ta))

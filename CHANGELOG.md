@@ -1,5 +1,21 @@
 # Changelog
 
+## Version 0.3
+
+This release uses CBLAS/LAPACKE interface which makes wrappers thinner. Notable
+changes are:
+
+* Incompatible change: `mult` does not accept `NIL` for `:ta` and `:tb` keyword
+  arguments. Possible values are now `:no-trans`, `:trans`, `:conj-trans`,
+  `:conj-no-trans` and `T`. The default is `:no-trans` (no matrix transposition)
+  which corresponds to `NIL` in previous versions. `T` is an alias for `:trans`.
+* Incompatible change: `eig` and `eig-self-adjoint` now return eigenvectors
+  stored in columns (like numpy does) so the following holds: `AV = V diag(Λ)`
+  where `V` and `Λ` are eigenvectors and eigenvalues returned from these
+  functions.
+* Incompatible change: C compiler and OpenBLAS headers are required to build
+  this wrapper.
+
 ## Version 0.2.1
 
 * `norm` accepts matrices too. In this case Frobenius norm is computed.

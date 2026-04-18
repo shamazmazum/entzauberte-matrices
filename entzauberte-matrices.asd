@@ -1,5 +1,5 @@
 (defsystem :entzauberte-matrices
-    :version "0.2"
+    :version "0.3"
     :author "Vasily Postnicov <shamaz.mazum@gmail.com>"
     :description "Fast wrapper around LAPACK"
     :license "2-clause BSD"

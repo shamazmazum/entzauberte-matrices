@@ -79,7 +79,7 @@ m\\) matrix, \\(V^T\\) is an orthogonal \\(n \\times n\\) matrix and
 @begin[lang=lisp](code)
 (multiple-value-bind (U Σ VT)
     (svd m)
-  (approx= (mult U (mult (from-diag Σ m n) VT)) m))
+  (approx= (@ U (from-diag Σ m n) VT) m))
 @end(code)
 
 is @c(T). If @c(:compact) is @c(T) then \\(U\\) is a semi-orthogonal
@@ -92,7 +92,7 @@ that in pseudocode
     (svd m :compact t)
   (let ((r (min (array-dimension m 0)
                 (array-dimension m 1))))
-    (approx= (mult U (mult (from-diag Σ r r) VT)) m)))
+    (approx= (@ U (from-diag Σ r r) VT) m)))
 @end(code)
 
 is @c(T). The first three returned values may be @c(NIL) if the
