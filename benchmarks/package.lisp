@@ -1,5 +1,5 @@
 (defpackage entzauberte-matrices/benchmarks
   (:use #:cl)
   (:local-nicknames (#:em #:entzauberte-matrices)
-                    (#:tb #:trivial-benchmark))
+                    (#:tb #:org.shirakumo.trivial-benchmark))
   (:export #:run-benchmarks))
