@@ -6,13 +6,21 @@
   (t (:default "libopenblas")))
 (use-foreign-library openblas)
 
-;; Some if not all fucking linux distributions build openblas without
-;; lapacke. Use slow implementation on linux
-(define-foreign-library lapacke
-  (:unix  (:or "liblapacke.so"))
-  (t (:default "liblapacke")))
-#+linux
-(use-foreign-library lapacke)
+;; Some fucking linux distributions build openblas without lapacke. I
+;; know Ubuntu does this for sure. Use slow implementation on it.
+(let ((fucking-linux-p
+        (ignore-errors
+         (with-open-file (input "/etc/os-release")
+           (loop for line = (read-line input nil)
+                 while line
+                 when (search "ubuntu" line :test #'char-equal) do
+                   (return t))))))
+  (when fucking-linux-p
+    (progn
+      (define-foreign-library lapacke
+        (:unix  (:or "liblapacke.so"))
+        (t (:default "liblapacke")))
+      (use-foreign-library lapacke))))
 
 ;; Utility function to tell OpenBLAS not to use all available CPU
 ;; resources.
