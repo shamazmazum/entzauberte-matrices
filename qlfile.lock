@@ -18,10 +18,6 @@
  (:class qlot/source/ql:source-ql
   :initargs (:%version :latest)
   :version "ql-2024-10-12"))
-("shamazmazum-approx" .
- (:class qlot/source/ultralisp:source-ultralisp
-  :initargs (:%version :latest)
-  :version "ultralisp-20260205090500"))
 ("magicl" .
  (:class qlot/source/ql:source-ql
   :initargs (:%version :latest)
@@ -42,3 +38,7 @@
  (:class qlot/source/github:source-github
   :initargs (:repos "shamazmazum/scriba" :ref nil :branch nil :tag nil)
   :version "github-cb81448f4622dedf00bb1f6e87e9a11474c9c13a"))
+("approx" .
+ (:class qlot/source/github:source-github
+  :initargs (:repos "shamazmazum/approx" :ref nil :branch nil :tag nil)
+  :version "github-fc8eee714d39c9a1cf69139cd9232b67b3c992e7"))
