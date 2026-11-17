@@ -14,7 +14,7 @@ displaced arrays."
 
 (sb-c:defoptimizer (array-storage-vector sb-c:derive-type) ((array))
   (let* ((type (sb-c::lvar-conservative-type array))
-         (dims (array-type-dimensions type))
+         (dims (sb-c::array-type-dimensions-or-give-up type nil))
          (et   (sb-c::array-type-upgraded-element-type type)))
     (sb-kernel:make-array-type
      (cond

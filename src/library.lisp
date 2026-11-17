@@ -95,19 +95,13 @@
              (if (eq api :blas) "cblas" "LAPACKE")
              (string-downcase name)))))
 
-(defun array-type-dimensions (type)
-  (catch 'sb-c::give-up-ir1-transform
-    (return-from array-type-dimensions
-      (sb-c::array-type-dimensions-or-give-up type)))
-  '*)
-
 ;; Common and very stupid type deriver. The user should always specify
 ;; rank for this function to work.
 (defun first-arg-array-type-deriver (call)
   (let* ((array-lvar (first (sb-c::combination-args call)))
          (type (sb-c::lvar-conservative-type array-lvar))
          (et   (sb-c::array-type-upgraded-element-type type))
-         (dims (array-type-dimensions type)))
+         (dims (sb-c::array-type-dimensions-or-give-up type nil)))
     (sb-kernel:make-array-type
      dims
      :complexp nil
